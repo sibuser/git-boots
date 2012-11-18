@@ -1,0 +1,18 @@
+#!/bin/bash
+
+. $(dirname $0)/git-utils
+
+case $# in 
+    0)
+	commit=HEAD
+	;;
+    1)
+	commit=$(git rev-parse -q --verify $1)
+	test -z $commit && die "invalid argument"
+	;;
+    *)
+	usage "[<commit>]"
+	;;
+esac
+
+git log $commit...@{u}

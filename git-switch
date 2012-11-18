@@ -1,0 +1,29 @@
+#!/bin/bash
+
+. $(dirname $0)/git-utils
+
+case $# in
+    1)
+	new_branch="$1"
+	;;
+    *)
+	usage "<branch>"
+	;;
+esac
+
+test -z $new_branch && die "Invalid branch name."
+
+echo "Stashing current changes if any..."
+stash=$(git stash)
+
+# create if not yet exists
+test git rev-parse -q --verify $new_branch >/dev/null || \
+    git branch $new_branch
+
+git checkout $new_branch
+
+if test ! -z $stash
+then
+    echo "Unstashing changes..."
+    git show $stash | git apply
+fi
