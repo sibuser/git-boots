@@ -6,6 +6,15 @@ GIT_TRASH_DEFAULT="$GIT_DIR/.GIT_TRASH"
 
 trap 'rm -f "$GIT_TRASH"' 0
 
+function err {
+    echo "$1" 1>&2
+}
+
+function die {
+    err "$1"
+    exit 1
+}
+
 function stash_size {
     echo $(git stash list | wc -l)
 }
@@ -59,8 +68,7 @@ case "$1" in
 	# fallthrough
 	;;
     *)
-	echo "Invalid command."
-	exit 1
+	die "Invalid command!"
 	;;
 esac
     
@@ -74,7 +82,7 @@ git stash save "$@" &>/dev/null || (echo "Failed to stash!" && exit 1)
 after=$(stash_size)
 
 # stash size didn't change, nothing to trash
-test $after -eq $before && echo "No local changes to trash." && exit 0
+test $after -eq $before && die "No local changes to trash!"
 
 # remember stash
 stash=$(git rev-parse refs/stash)
@@ -100,7 +108,7 @@ trash=$(git log --no-walk --format=%B $stash | sed -n '
 }' | git commit-tree -p ${parents[0]} -p ${parents[1]} -F - $tree)
 
 (test -z $trash || test "$(git cat-file -t $trash)" !=  "commit") && \
-    echo "Error in trash bin!" && \
+    err "Failed to trash!" && \
     git stash apply $stash
 
 echo "\
