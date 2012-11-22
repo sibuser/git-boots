@@ -3,6 +3,8 @@
 GIT_TRASH=
 GIT_TRASH_DEFAULT="$(git rev-parse --git-dir)/.GIT_TRASH"
 
+trap 'rm -f "$GIT_TRASH"' 0
+
 function stash_size {
     echo $(git stash list | wc -l)
 }
