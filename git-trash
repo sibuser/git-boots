@@ -76,7 +76,9 @@ esac
 before=$(stash_size)
 
 # try to stash
-git stash save "$@" &>/dev/null || (echo "Failed to stash!" && exit 1)
+args=$(git rev-parse --sq-quote "$@")
+command="git stash save $args"
+eval "$command" >/dev/null || die "Failed to stash!"
 
 # remember stash size after
 after=$(stash_size)
