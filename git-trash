@@ -76,6 +76,11 @@ set -e
 test $# -eq 0 && set "save" "$@"
 
 case "$1" in
+    search)
+	shift
+	trash_search "$@"
+	exit 0
+	;;
     dig)
 	shift
 	trash_dig "$@"
