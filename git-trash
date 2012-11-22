@@ -4,6 +4,9 @@ GIT_DIR="$(git rev-parse --git-dir)"
 GIT_TRASH=
 GIT_TRASH_DEFAULT="$GIT_DIR/.GIT_TRASH"
 
+GIT_TRASH_REF="refs/heads/trash"
+GIT_TRASH_LOG="$GIT_DIR/logs/$GIT_TRASH_REF"
+
 trap 'rm -f "$GIT_TRASH"' 0
 
 function err {
@@ -15,24 +18,44 @@ function die {
     exit 1
 }
 
+# stash size
 function stash_size {
     echo $(git stash list | wc -l)
 }
 
-function trash_commits {
+# search for trash
+function trash_search {
     test -z "$GIT_TRASH" &&
     GIT_TRASH="$GIT_TRASH_DEFAULT" &&
     git fsck --no-progress --unreachable | \
 	awk '/commit/ {print $3}' | \
-	git log --stdin --no-walk --format='%H' --grep="^TRASH" | \
+	git rev-list --reverse --stdin --no-walk --grep="^TRASH" HEAD | \
 	sed "/$(git rev-parse HEAD)/ d" > "$GIT_TRASH"
 }
 
+# bury trash back, does it smell?
+function trash_bury {
+    if current=$(git show-ref -q --verify $GIT_TRASH_REF)
+    then
+	git reflog expire --expire=now $GIT_TRASH_REF
+	git update-ref -d $GIT_TRASH_REF $current
+    fi
+}
+
+# dig for trash
+function trash_dig {
+    trash_search
+    while read commit
+    do
+	subject="$(git log --no-walk --format='%s' $commit)"
+	git update-ref -m "$subject" $GIT_TRASH_REF $commit
+    done < "$GIT_TRASH"
+}
+
+# list recovered trash
 function trash_list {
-    trash_commits
-    test -s "$GIT_TRASH" &&
-    git log --stdin --no-walk --format='%h %s' < "$GIT_TRASH" | \
-	awk '{print "trash{"i++"}: " $0}'
+    git show-ref -q --verify $GIT_TRASH_REF || exit 0
+    git reflog $GIT_TRASH_REF
 }
 
 function trash_parse {
@@ -53,6 +76,16 @@ set -e
 test $# -eq 0 && set "save" "$@"
 
 case "$1" in
+    dig)
+	shift
+	trash_dig "$@"
+	exit 0
+	;;
+    bury)
+	shift
+	trash_bury "$@"
+	exit 0
+	;;
     list)
 	shift
 	trash_list "$@"
