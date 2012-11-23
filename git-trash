@@ -65,17 +65,9 @@ function trash_list {
     git log --format="%h %gd: %gs" -g "$@" $GIT_TRASH_REF --
 }
 
-function trash_parse {
-    index=$(echo "$1" | sed -n 's/^\(trash\)?{\([0-9][0-9]*\)}/\2/p')
-    test -n $index &&
-    trash_commits &&
-    awk "NR==($index+1)" < "$GIT_TRASH"
-}
-
+# apply trash commit
 function trash_apply {
-    index=$(trash_parse "$1")
-    test -n $index &&
-    git stash apply $index
+    git stash apply "$@"
 }
 
 # save to trash
