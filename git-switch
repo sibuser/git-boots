@@ -4,11 +4,11 @@
 
 case $# in
     1)
-	new_branch="$1"
-	;;
+    new_branch="$1"
+    ;;
     *)
-	usage "<branch>"
-	;;
+    usage "<branch>"
+    ;;
 esac
 
 test -z $new_branch && die "Invalid branch name."
