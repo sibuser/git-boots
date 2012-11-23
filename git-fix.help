@@ -1,0 +1,28 @@
+#!/bin/bash
+
+OPTIONS_SPEC=$(cat<<EOF
+$(basename $0) <commit>
+--
+ Available options are
+h,help            show help
+EOF
+)
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE=$(cat << EOF
+DESCRIPTION
+
+Lets you fixup some commit in the past. It will take changes in the index
+(staging area) and squash them with the specified commit using the original
+commit message.
+
+If working tree is dirty it will be stashed and later automatically unstashed
+(or you'll be asked to do it manually after any rebase conflicts are solved).
+
+EXAMPLES
+
+    Fixup commit two commits behind HEAD with current changes:
+
+        \$ $(basename $0) HEAD~2
+EOF
+)

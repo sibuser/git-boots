@@ -1,0 +1,43 @@
+#!/bin/bash
+
+. "$(git boots --sh-setup)"
+
+set -e
+
+no_flags
+
+case $# in
+    1)
+        commit="$(git rev-parse -q --verify $1)"
+        test -z "$commit" && die "invalid argument"
+        ;;
+    *)
+        usage
+        ;;
+esac
+
+test -z "$commit" && usage
+
+# create fixup commit
+git commit --fixup=$commit
+
+# stash if working tree is dirty
+before=$(stash_size)
+git stash &>/dev/null
+after=$(stash_size)
+if $after -gt $before
+then
+    echo "Stashed your changes."
+    stash="yes"
+fi
+
+# automatically apply fixup
+git rebase --autosquash --interactive $commit^ || \
+    if [ -z "$stash" ]; then
+        die "Resolve conflicts."
+    else
+        die "Resolve conflicts and manually unstash your changes."
+    fi
+
+# pop from stash if stashed
+test -n "$stash" && git stash pop
