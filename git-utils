@@ -1,7 +1,15 @@
 #!/bin/bash
 
+function say {
+    echo "$1"
+}
+
+function err {
+    echo "$1" 1>&2
+}
+
 function die {
-    echo $1
+    err "$1"
     exit 1
 }
 
