@@ -5,7 +5,6 @@ GIT_TRASH=
 GIT_TRASH_DEFAULT="$GIT_DIR/.GIT_TRASH"
 
 GIT_TRASH_REF="refs/heads/trash"
-GIT_TRASH_LOG="$GIT_DIR/logs/$GIT_TRASH_REF"
 
 trap 'rm -f "$GIT_TRASH"' 0
 
