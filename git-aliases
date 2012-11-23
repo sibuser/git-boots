@@ -1,0 +1,7 @@
+#!/bin/bash
+
+git config --global alias.append   "commit --amend -C HEAD"
+git config --global alias.last     "log -n 1"
+git config --global alias.index    "diff --cached"
+git config --global alias.incoming "log ...@{u}"
+git config --global alias.outgoing "log @{u}..."
