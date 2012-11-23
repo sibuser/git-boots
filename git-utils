@@ -1,18 +1,41 @@
 #!/bin/bash
 
-function say {
-    echo "$1"
-}
-
-function err {
+err () {
     echo "$1" 1>&2
 }
 
-function die {
-    err "$1"
-    exit 1
+help () {
+    "$0" -h
+    test -n "$LONG_USAGE" && echo "$LONG_USAGE"
+    exit 0
 }
 
-function usage {
-    die "Usage: $1"
-}
+# some scripts rely on 1.8.0 functionality
+test "$(git --version)" != "git version 1.8.0" &&
+    die "Update your git to 1.8.0"
+
+# must be before --help option check
+. "$(dirname $(readlink -e $0))/$(basename $0).help"
+
+# must be before git-sh-setup is sourced
+for opt in "$@"; do
+    test "$opt" = "--help" && help
+done
+
+. "$(git --exec-path)/git-sh-setup"
+
+GIT_BUILTIN=$(cat << EOF
+say
+die
+usage
+EOF
+)
+
+while read func
+do
+    if ! type -t $func >/dev/null
+    then
+        err "Missing git builtin bash function: $func" &&
+        exit 1
+    fi
+done < (echo "$GIT_BUILTIN")
