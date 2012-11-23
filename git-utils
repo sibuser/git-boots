@@ -10,6 +10,21 @@ help () {
     exit 0
 }
 
+no_flags () {
+    while getopts "" flag; do
+        case $flag in
+            :|\?)
+                usage
+                ;;
+        esac
+    done
+    shift $((OPTIND - 1))
+}
+
+stash_size () {
+    echo $(git stash list | wc -l)
+}
+
 # some scripts rely on 1.8.0 functionality
 test "$(git --version)" != "git version 1.8.0" &&
     die "Update your git to 1.8.0"
