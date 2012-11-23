@@ -48,11 +48,11 @@ usage
 EOF
 )
 
-while read func
+echo "$GIT_BUILTIN" | while read func
 do
     if ! type -t $func >/dev/null
     then
         err "Missing git builtin bash function: $func" &&
         exit 1
     fi
-done < (echo "$GIT_BUILTIN")
+done
