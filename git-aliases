@@ -1,9 +1,21 @@
 #!/bin/bash
 
-git config --global alias.append          "commit --amend -C HEAD"
-git config --global alias.last            "log -n 1"
-git config --global alias.index           "diff --cached"
-git config --global alias.incoming        "log ...@{u}"
-git config --global alias.outgoing        "log @{u}..."
-git config --global alias.new             "log $1@{1}..$1@{0}"
-git config --global alias.empty-tree-sha1 "hash-object -t tree /dev/null"
+GIT_ALIASES=$(cat << EOF
+append          commit --amend -C HEAD
+last            log -n 1
+index           diff --cached
+incoming        log ...@{u}
+outgoing        log @{u}...
+new             log $1@{1}..$1@{0}
+empty-tree-sha1 hash-object -t tree /dev/null
+EOF
+)
+
+set -e
+
+echo "$GIT_ALIASES" | while read line;
+do
+    alias=$(echo "$line"   | awk '{print $1}')
+    command=$(echo "$line" | awk '{print substr($0,index($0,$2))}')
+    eval "git config --global alias.$alias \"$command\""
+done
