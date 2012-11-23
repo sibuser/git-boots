@@ -30,8 +30,8 @@ function stash_size {
 # search for trash
 function trash_search {
     git fsck --no-progress --unreachable | \
-	awk '/commit/ {print $3}' | \
-	git rev-list --reverse --stdin --no-walk --grep="$regex_trash" --not HEAD --
+        awk '/commit/ {print $3}' | \
+        git rev-list --reverse --stdin --no-walk --grep="$regex_trash" --not HEAD --
 }
 
 # bury trash back, does it smell?
@@ -46,10 +46,10 @@ function trash_bury {
 # dig for trash
 function trash_dig {
     trash_search | \
-    while read commit
+        while read commit
     do
-	subject="$(git log --no-walk --format='%s' $commit --)"
-	git update-ref -m "$subject" $ref_trash $commit
+        subject="$(git log --no-walk --format='%s' $commit --)"
+        git update-ref -m "$subject" $ref_trash $commit
     done
 }
 
@@ -110,8 +110,8 @@ function trash_save {
 }' | git commit-tree -p ${parents[0]} -p ${parents[1]} $tree)
 
     (test -z $trash || test "$(git cat-file -t $trash)" !=  "commit") && \
-	err "Failed to trash!" && \
-	git stash apply $stash
+        err "Failed to trash!" && \
+        git stash apply $stash
 
     echo "\
 Trashed working directory and index state $(git log --no-walk --format=%s $trash -- ).
@@ -124,30 +124,30 @@ test $# -eq 0 && set "save" "$@"
 
 case "$1" in
     search)
-	shift
-	trash_search "$@"
-	;;
+        shift
+        trash_search "$@"
+        ;;
     dig)
-	shift
-	trash_dig "$@"
-	;;
+        shift
+        trash_dig "$@"
+        ;;
     clean|bury)
-	shift
-	trash_bury "$@"
-	;;
+        shift
+        trash_bury "$@"
+        ;;
     list)
-	shift
-	trash_list "$@"
-	;;
+        shift
+        trash_list "$@"
+        ;;
     apply)
-	shift
-	trash_apply "$@"
-	;;
+        shift
+        trash_apply "$@"
+        ;;
     save)
-	shift
-	trash_save "$@"
-	;;
+        shift
+        trash_save "$@"
+        ;;
     *)
-	die "Invalid command!"
-	;;
+        die "Invalid command!"
+        ;;
 esac
