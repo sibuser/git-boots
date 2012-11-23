@@ -36,11 +36,11 @@ function trash_search {
 
 # bury trash back, does it smell?
 function trash_bury {
-    if current=$(git show-ref -q --verify $GIT_TRASH_REF)
-    then
-	git reflog expire --expire=now $GIT_TRASH_REF
-	git update-ref -d $GIT_TRASH_REF $current
-    fi
+    trash_have || return 0
+
+    current=$(git show-ref -q --verify $GIT_TRASH_REF)
+    git reflog expire --expire=now $GIT_TRASH_REF
+    git update-ref -d $GIT_TRASH_REF $current
 }
 
 # dig for trash
@@ -53,10 +53,16 @@ function trash_dig {
     done < "$GIT_TRASH"
 }
 
+# check if trash exist
+function trash_have {
+    git show-ref -q --verify $GIT_TRASH_REF
+}
+
 # list recovered trash
 function trash_list {
-    git show-ref -q --verify $GIT_TRASH_REF || exit 0
-    git reflog $GIT_TRASH_REF
+    trash_have || return 0
+
+    git log --format="%h %gd: %gs" -g "$@" $GIT_TRASH_REF --
 }
 
 function trash_parse {
