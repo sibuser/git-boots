@@ -8,6 +8,7 @@ incoming        log ...@{u}
 outgoing        log @{u}...
 new             log $1@{1}..$1@{0}
 empty-tree-sha1 hash-object -t tree /dev/null
+stash-unapply   git stash show -p | git apply -R
 EOF
 )
 
