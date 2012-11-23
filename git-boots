@@ -1,4 +1,45 @@
 #!/bin/bash
 
+year="$(date +%Y)"
+author="$(git config --get user.name)"
+email="$(git config --get user.email)"
+
 test "$1" = "--sh-setup" &&
 echo $(dirname $(readlink -e $0))/git-utils
+
+test "$1" == "--clean" &&
+shift &&
+for file in "$@"
+do
+    sed -i 's/\t/    /g' $file
+    sed -i 's/[ \t]*$//g' $file
+done
+
+test "$1" == "--copyright" &&
+shift &&
+for file in "$@"
+do
+    sed -i -n "
+1 {
+# read extra line
+    N
+# check Copyright present
+    s:Copyright:&:
+# skip if so
+    t skip
+# print header
+    P
+# insert missing copyright
+    i\
+# Copyright (c) $year, $author <$email>
+# delete header & next cycle
+    D
+    :skip
+# print header & delete it
+    P;D
+}
+1 ! {
+    p
+}
+" $file
+done
