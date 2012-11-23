@@ -7,6 +7,7 @@
 # TODO trash_drop ~ git stash drop
 # TODO trash_branch ~ git stash branch
 # TODO write help & usage
+# TODO filter out commits with the same tree?
 #
 
 ref_trash="refs/heads/trash"
