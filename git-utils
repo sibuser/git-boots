@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
 err () {
     echo "$1" 1>&2
