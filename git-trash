@@ -78,73 +78,36 @@ function trash_apply {
     git stash apply $index
 }
 
-set -e
+# save to trash
+function trash_save {
+    # remember stash size before
+    before=$(stash_size)
 
-test $# -eq 0 && set "save" "$@"
+    # try to stash
+    args=$(git rev-parse --sq-quote "$@")
+    command="git stash save $args"
+    eval "$command" >/dev/null || die "Failed to stash!"
 
-case "$1" in
-    search)
-	shift
-	trash_search "$@"
-	exit 0
-	;;
-    dig)
-	shift
-	trash_dig "$@"
-	exit 0
-	;;
-    bury)
-	shift
-	trash_bury "$@"
-	exit 0
-	;;
-    list)
-	shift
-	trash_list "$@"
-	exit 0
-	;;
-    apply)
-	shift
-	trash_apply "$@"
-	exit 0
-	;;
-    save)
-	shift
-	# fallthrough
-	;;
-    *)
-	die "Invalid command!"
-	;;
-esac
-    
-# remember stash size before
-before=$(stash_size)
+    # remember stash size after
+    after=$(stash_size)
 
-# try to stash
-args=$(git rev-parse --sq-quote "$@")
-command="git stash save $args"
-eval "$command" >/dev/null || die "Failed to stash!"
+    # stash size didn't change, nothing to trash
+    test $after -eq $before && die "No local changes to trash!"
 
-# remember stash size after
-after=$(stash_size)
+    # remember stash
+    stash=$(git rev-parse refs/stash)
 
-# stash size didn't change, nothing to trash
-test $after -eq $before && die "No local changes to trash!"
+    # drop stash
+    git stash drop &>/dev/null
 
-# remember stash
-stash=$(git rev-parse refs/stash)
+    # detect stash's tree
+    tree=$(git cat-file -p $stash | awk '/^tree/ {print $2; exit}')
 
-# drop stash
-git stash drop &>/dev/null
+    # detect stash's parents
+    declare -a parents=($(git cat-file -p $stash | awk '/^parent/ {print $2}'))
 
-# detect stash's tree
-tree=$(git cat-file -p $stash | awk '/^tree/ {print $2; exit}')
-
-# detect stash's parents
-declare -a parents=($(git cat-file -p $stash | awk '/^parent/ {print $2}'))
-
-# create a new trash commit, use stash's message & parents
-trash=$(git log --no-walk --format=%B $stash | sed -n '
+    # create a new trash commit, use stash's message & parents
+    trash=$(git log --no-walk --format=%B $stash | sed -n '
 1 {
     s/^WIP on/TRASH on/
     s/^On/TRASH on/
@@ -154,11 +117,45 @@ trash=$(git log --no-walk --format=%B $stash | sed -n '
     p
 }' | git commit-tree -p ${parents[0]} -p ${parents[1]} -F - $tree)
 
-(test -z $trash || test "$(git cat-file -t $trash)" !=  "commit") && \
-    err "Failed to trash!" && \
-    git stash apply $stash
+    (test -z $trash || test "$(git cat-file -t $trash)" !=  "commit") && \
+	err "Failed to trash!" && \
+	git stash apply $stash
 
-echo "\
+    echo "\
 Trashed working directory and index state $(git log --no-walk --format=%s $trash).
 HEAD is now at $(git log --no-walk --format='%h %s' HEAD)"
+}
 
+set -e
+
+test $# -eq 0 && set "save" "$@"
+
+case "$1" in
+    search)
+	shift
+	trash_search "$@"
+	;;
+    dig)
+	shift
+	trash_dig "$@"
+	;;
+    bury)
+	shift
+	trash_bury "$@"
+	;;
+    list)
+	shift
+	trash_list "$@"
+	;;
+    apply)
+	shift
+	trash_apply "$@"
+	;;
+    save)
+	shift
+	trash_save "$@"
+	;;
+    *)
+	die "Invalid command!"
+	;;
+esac
