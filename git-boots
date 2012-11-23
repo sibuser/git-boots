@@ -1,0 +1,4 @@
+#!/bin/bash
+
+test "$1" = "--sh-setup" &&
+echo $(dirname $(readlink -e $0))/git-utils

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. "$(dirname $0)/git-utils"
+. "$(git boots --sh-setup)"
 
 while getopts "fn" flag; do
     case $flag in
