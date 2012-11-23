@@ -37,8 +37,7 @@ function trash_search {
     GIT_TRASH="$GIT_TRASH_DEFAULT" &&
     git fsck --no-progress --unreachable | \
 	awk '/commit/ {print $3}' | \
-	git rev-list --reverse --stdin --no-walk --grep="^TRASH" HEAD -- | \
-	sed "/$(git rev-parse HEAD)/ d" | \
+	git rev-list --reverse --stdin --no-walk --grep="^TRASH" --not HEAD -- | \
 	tee "$GIT_TRASH"
 }
 
