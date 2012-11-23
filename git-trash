@@ -107,7 +107,7 @@ function trash_save {
 }
 1 ! {
     p
-}' | git commit-tree -p ${parents[0]} -p ${parents[1]} -F - $tree)
+}' | git commit-tree -p ${parents[0]} -p ${parents[1]} $tree)
 
     (test -z $trash || test "$(git cat-file -t $trash)" !=  "commit") && \
 	err "Failed to trash!" && \
