@@ -30,7 +30,8 @@ function trash_search {
     git fsck --no-progress --unreachable | \
 	awk '/commit/ {print $3}' | \
 	git rev-list --reverse --stdin --no-walk --grep="^TRASH" HEAD | \
-	sed "/$(git rev-parse HEAD)/ d" > "$GIT_TRASH"
+	sed "/$(git rev-parse HEAD)/ d" | \
+	tee "$GIT_TRASH"
 }
 
 # bury trash back, does it smell?
