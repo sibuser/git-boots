@@ -14,11 +14,21 @@ EOF
 
 set -e
 
+. $(dirname $0)/git-utils
+
 echo "$GIT_ALIASES" | \
     sed '/^[ \t]*(#|$)/ d' | \
     while read line;
 do
     alias=$(echo "$line"   | awk '{print $1}')
     command=$(echo "$line" | awk '{print substr($0,index($0,$2))}')
-    eval "git config --global alias.$alias \"$command\""
+
+    if git config --get alias.$alias >/dev/null
+    then
+        err "git-$alias is already set, skip"
+        continue
+    fi
+
+    git config "$@" alias."$alias" "\"$command\""
+    say "git-$alias is set"
 done
