@@ -1,0 +1,35 @@
+#!/bin/bash
+
+. "$(dirname $0)/git-utils"
+
+while getopts "fn" flag; do
+    case $flag in
+        f)
+            git_force="-f"
+            ;;
+        n)
+            sed_quiet="-n"
+            ;;
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+require_clean_work_tree "execute $(basename $0)" "Commit or stash your changes and try again."
+
+if [ $# -lt 2 ]; then
+    usage
+fi
+
+sed_script="$1"
+shift
+rev_args="$@"
+
+$(git rev-parse $rev_args &>/dev/null) || \
+    die "ambiguous argument '$rev_args': unknown revision."
+
+git filter-branch $git_force --msg-filter "
+    sed $sed_quiet -r '$sed_script'
+" $rev_args
