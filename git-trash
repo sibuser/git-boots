@@ -13,29 +13,29 @@
 ref_trash="refs/heads/trash"
 regex_trash="^TRASH"
 
-function err {
+err () {
     echo "$1" 1>&2
 }
 
-function die {
+die () {
     err "$1"
     exit 1
 }
 
 # stash size
-function stash_size {
+stash_size () {
     echo $(git stash list | wc -l)
 }
 
 # search for trash
-function trash_search {
+trash_search () {
     git fsck --no-progress --unreachable | \
         awk '/commit/ {print $3}' | \
         git rev-list --reverse --stdin --no-walk --grep="$regex_trash" --not HEAD --
 }
 
 # bury trash back, does it smell?
-function trash_bury {
+trash_bury () {
     trash_have || return 0
 
     current=$(git show-ref -q --verify $ref_trash)
@@ -44,7 +44,7 @@ function trash_bury {
 }
 
 # dig for trash
-function trash_dig {
+trash_dig () {
     trash_search | \
         while read commit
     do
@@ -54,24 +54,24 @@ function trash_dig {
 }
 
 # check if trash exist
-function trash_have {
+trash_have () {
     git show-ref -q --verify $ref_trash
 }
 
 # list recovered trash
-function trash_list {
+trash_list () {
     trash_have || return 0
 
     git log --format="%h %gd: %gs" -g "$@" $ref_trash --
 }
 
 # apply trash commit
-function trash_apply {
+trash_apply () {
     git stash apply "$@"
 }
 
 # save to trash
-function trash_save {
+trash_save () {
     # remember stash size before
     before=$(stash_size)
 
