@@ -4,8 +4,7 @@
 . "$(git boots --sh-setup)"
 
 set -e
-
-no_flags
+set $(no_flags "$@")
 
 case $# in
     1)

@@ -20,6 +20,7 @@ no_flags () {
         esac
     done
     shift $((OPTIND - 1))
+    echo "$@"
 }
 
 stash_size () {
