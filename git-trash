@@ -1,4 +1,13 @@
 #!/bin/sh
+#
+# TODO trash_clean = trash_bury, alias
+# TODO trash_save is too complex, dig stash commits instead
+# TODO better dig progress output (add subject?)
+# TODO trash_show ~ git stash show
+# TODO trash_drop ~ git stash drop
+# TODO trash_branch ~ git stash branch
+# TODO write help & usage
+#
 
 GIT_DIR="$(git rev-parse --git-dir)"
 GIT_TRASH=
