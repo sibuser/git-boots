@@ -10,6 +10,7 @@
 #
 
 ref_trash="refs/heads/trash"
+regex_trash="^TRASH"
 
 function err {
     echo "$1" 1>&2
@@ -29,7 +30,7 @@ function stash_size {
 function trash_search {
     git fsck --no-progress --unreachable | \
 	awk '/commit/ {print $3}' | \
-	git rev-list --reverse --stdin --no-walk --grep="^TRASH" --not HEAD --
+	git rev-list --reverse --stdin --no-walk --grep="$regex_trash" --not HEAD --
 }
 
 # bury trash back, does it smell?
