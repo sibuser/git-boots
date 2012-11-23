@@ -1,6 +1,5 @@
 #!/bin/sh
 #
-# TODO trash_clean = trash_bury, alias
 # TODO trash_save is too complex, dig stash commits instead
 # TODO better dig progress output (add subject?)
 # TODO trash_show ~ git stash show
@@ -130,7 +129,7 @@ case "$1" in
 	shift
 	trash_dig "$@"
 	;;
-    bury)
+    clean|bury)
 	shift
 	trash_bury "$@"
 	;;
