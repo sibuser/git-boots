@@ -13,7 +13,9 @@ EOF
 
 set -e
 
-echo "$GIT_ALIASES" | while read line;
+echo "$GIT_ALIASES" | \
+    sed '/^[ \t]*(#|$)/ d' | \
+    while read line;
 do
     alias=$(echo "$line"   | awk '{print $1}')
     command=$(echo "$line" | awk '{print substr($0,index($0,$2))}')
