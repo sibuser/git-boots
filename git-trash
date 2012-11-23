@@ -28,7 +28,7 @@ function trash_search {
     GIT_TRASH="$GIT_TRASH_DEFAULT" &&
     git fsck --no-progress --unreachable | \
 	awk '/commit/ {print $3}' | \
-	git rev-list --reverse --stdin --no-walk --grep="^TRASH" HEAD | \
+	git rev-list --reverse --stdin --no-walk --grep="^TRASH" HEAD -- | \
 	sed "/$(git rev-parse HEAD)/ d" | \
 	tee "$GIT_TRASH"
 }
@@ -47,7 +47,7 @@ function trash_dig {
     trash_search
     while read commit
     do
-	subject="$(git log --no-walk --format='%s' $commit)"
+	subject="$(git log --no-walk --format='%s' $commit --)"
 	git update-ref -m "$subject" $ref_trash $commit
     done < "$GIT_TRASH"
 }
@@ -98,7 +98,7 @@ function trash_save {
     declare -a parents=($(git cat-file -p $stash | awk '/^parent/ {print $2}'))
 
     # create a new trash commit, use stash's message & parents
-    trash=$(git log --no-walk --format=%B $stash | sed -n '
+    trash=$(git log --no-walk --format=%B $stash -- | sed -n '
 1 {
     s/^WIP on/TRASH on/
     s/^On/TRASH on/
@@ -113,8 +113,8 @@ function trash_save {
 	git stash apply $stash
 
     echo "\
-Trashed working directory and index state $(git log --no-walk --format=%s $trash).
-HEAD is now at $(git log --no-walk --format='%h %s' HEAD)"
+Trashed working directory and index state $(git log --no-walk --format=%s $trash -- ).
+HEAD is now at $(git log --no-walk --format='%h %s' HEAD -- )"
 }
 
 set -e
