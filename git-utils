@@ -1,6 +1,10 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
+GIT_NAME="$(git config --get user.name)"
+GIT_EMAIL="$(git config --get user.email)"
+GIT_COPYRIGHT="Copyright (c) $(date +%Y), $GIT_NAME <$GIT_EMAIL>"
+
 err () {
     echo "$1" 1>&2
 }
