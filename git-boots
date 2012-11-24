@@ -51,7 +51,7 @@ aliases_setup () {
         while read line;
     do
         alias=$(echo "$line"   | awk '{print $1}')
-        command=$(echo "$line" | awk '{print substr($0,index($0,$2))}')
+        command=$(echo "$line" | awk '{$1="";print}')
         if git config --get alias.$alias >/dev/null
         then
             err "git-$alias is already set, skip"
