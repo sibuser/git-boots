@@ -37,8 +37,12 @@ shift $((OPTIND - 1))
 EOF
 )
 
+boots_dir () {
+    echo "$(dirname $(readlink -e $0))"
+}
+
 sh_setup () {
-    echo "$(dirname $(readlink -e $0))/git-utils"
+    echo "$(boots_dir)/git-utils"
 }
 
 aliases_setup () {
@@ -113,6 +117,10 @@ case "$1" in
     --template)
         shift
         template "$@"
+        ;;
+    --dir)
+        shift
+        boots_dir "$@"
         ;;
     *)
         die "Invalid argument"
