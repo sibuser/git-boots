@@ -6,6 +6,9 @@ AUTHOR="$(git config --get user.name)"
 EMAIL="$(git config --get user.email)"
 COPYRIGHT="Copyright (c) $YEAR, $NAME <$EMAIL>"
 
+test "$1" != "--sh-setup" &&
+. "$(git boots --sh-setup)"
+
 sh_setup () {
     echo "$(dirname $(readlink -e $0))/git-utils"
 }
@@ -83,6 +86,6 @@ case "$1" in
         template "$@"
         ;;
     *)
-        error "Invalid argument"
+        die "Invalid argument"
         exit 1
 esac
