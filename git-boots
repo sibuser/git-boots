@@ -97,6 +97,10 @@ template () {
     echo "$GIT_TEMPLATE"
 }
 
+boots_todo() {
+    awk '/TODO/ && !/awk/ {printf "%-12s : %s\n", FILENAME, $0}' $(ls "$(git boots --dir)")
+}
+
 case "$1" in
     --sh-setup)
         shift
@@ -121,6 +125,10 @@ case "$1" in
     --dir)
         shift
         boots_dir "$@"
+        ;;
+    --todo)
+        shift
+        boots_todo "$@"
         ;;
     *)
         usage

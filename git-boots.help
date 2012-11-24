@@ -11,6 +11,7 @@ aliases-setup   aliases setup
 clean           clean files
 copyright       update copyright
 template        generate script template
-dir             outputs boots directory
+dir             output boots directory
+todo            output todos
 EOF
 )
