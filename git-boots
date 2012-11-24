@@ -97,6 +97,7 @@ template () {
     echo "$GIT_TEMPLATE"
 }
 
+# TODO add todo to the custom file
 boots_todo() {
     awk '/TODO/ && !/awk/ {printf "%-12s : %s\n", FILENAME, $0}' $(ls "$(git boots --dir)")
 }
