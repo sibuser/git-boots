@@ -13,9 +13,9 @@ stash-unapply   git stash show -p | git apply -R
 EOF
 )
 
-set -e
+. "$(git boots --sh-setup)"
 
-. $(dirname $0)/git-utils
+set -e
 
 echo "$GIT_ALIASES" | \
     sed '/^[ \t]*(#|$)/ d' | \

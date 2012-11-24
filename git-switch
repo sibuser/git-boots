@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
-. $(dirname $0)/git-utils
+. "$(git boots --sh-setup)"
 
 case $# in
     1)
