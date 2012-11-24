@@ -31,6 +31,15 @@ stash_size () {
     echo $(git stash list | wc -l)
 }
 
+require () {
+    for func in "$@"; do
+        if ! type -t "$func" >/dev/null; then
+            err "Missing git builtin bash function: $func"
+            exit 1
+        fi
+    done
+}
+
 # some scripts rely on 1.8.0 functionality
 test "$(git --version)" != "git version 1.8.0" &&
     die "Update your git to 1.8.0"
@@ -47,18 +56,4 @@ done
 
 . "$(git --exec-path)/git-sh-setup"
 
-GIT_BUILTIN=$(cat << EOF
-say
-die
-usage
-EOF
-)
-
-echo "$GIT_BUILTIN" | while read func
-do
-    if ! type -t $func >/dev/null
-    then
-        err "Missing git builtin bash function: $func" &&
-        exit 1
-    fi
-done
+require say die usage

@@ -2,6 +2,7 @@
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
 . "$(git boots --sh-setup)"
+require require_clean_work_tree
 
 while getopts "fn" flag; do
     case $flag in
