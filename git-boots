@@ -45,7 +45,7 @@ copyright () {
 }
 
 template () {
-template=$(cat << EOF
+    template=$(cat << EOF
 #!/bin/bash
 # $COPYRIGHT
 
@@ -64,8 +64,8 @@ while getopts "" flag; do
 done
 shift $((OPTIND - 1))
 EOF
-)
-echo "$template"
+    )
+    echo "$template"
 }
 
 case "$1" in
