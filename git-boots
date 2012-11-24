@@ -1,6 +1,11 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
+YEAR="$(date +%Y)"
+AUTHOR="$(git config --get user.name)"
+EMAIL="$(git config --get user.email)"
+COPYRIGHT="Copyright (c) $YEAR, $NAME <$EMAIL>"
+
 sh_setup () {
     echo "$(dirname $(readlink -e $0))/git-utils"
 }
@@ -11,9 +16,6 @@ clean () {
 }
 
 copyright () {
-    year="$(date +%Y)"
-    author="$(git config --get user.name)"
-    email="$(git config --get user.email)"
     sed -i -n "
 1 {
 # read extra line
@@ -26,7 +28,7 @@ copyright () {
     P
 # insert missing copyright
     i\
-# Copyright (c) $year, $author <$email>
+# $COPYRIGHT
 # delete header & next cycle
     D
     :skip
