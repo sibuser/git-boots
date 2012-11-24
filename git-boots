@@ -13,6 +13,27 @@ stash-unapply   git stash show -p | git apply -R
 EOF
 )
 
+GIT_TEMPLATE=$(cat << EOF
+#!/bin/bash
+# $COPYRIGHT
+
+. "\$(git boots --sh-setup)"
+
+set -e
+
+# a  - simple
+# b: - with arg (\$OPTARG)
+while getopts "" flag; do
+    case $flag in
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+EOF
+)
+
 YEAR="$(date +%Y)"
 AUTHOR="$(git config --get user.name)"
 EMAIL="$(git config --get user.email)"
@@ -74,27 +95,7 @@ copyright () {
 }
 
 template () {
-    template=$(cat << EOF
-#!/bin/bash
-# $COPYRIGHT
-
-. "\$(git boots --sh-setup)"
-
-set -e
-
-# a  - simple
-# b: - with arg (\$OPTARG)
-while getopts "" flag; do
-    case $flag in
-        :|\?)
-            usage
-            ;;
-    esac
-done
-shift $((OPTIND - 1))
-EOF
-    )
-    echo "$template"
+    echo "$GIT_TEMPLATE"
 }
 
 case "$1" in
