@@ -1,0 +1,14 @@
+#!/bin/bash
+
+OPTIONS_SPEC=$(cat << EOF
+$(basename $0) [options]
+--
+ Available options are
+h,help          show help
+sh-setup        shell setup
+aliases-setup   aliases setup
+clean           clean files
+copyright       update copyright
+template        generate script template
+EOF
+)
