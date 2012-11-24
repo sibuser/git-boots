@@ -41,6 +41,30 @@ copyright () {
 " "$@"
 }
 
+template () {
+template=$(cat << EOF
+#!/bin/bash
+# $COPYRIGHT
+
+. "\$(git boots --sh-setup)"
+
+set -e
+
+# a  - simple
+# b: - with arg (\$OPTARG)
+while getopts "" flag; do
+    case $flag in
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+EOF
+)
+echo "$template"
+}
+
 case "$1" in
     --sh-setup)
         shift
@@ -53,6 +77,10 @@ case "$1" in
     --copyright)
         shift
         copyright "$@"
+        ;;
+    --template)
+        shift
+        template "$@"
         ;;
     *)
         error "Invalid argument"
