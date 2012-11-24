@@ -35,9 +35,9 @@ EOF
 )
 
 YEAR="$(date +%Y)"
-AUTHOR="$(git config --get user.name)"
-EMAIL="$(git config --get user.email)"
-COPYRIGHT="Copyright (c) $YEAR, $NAME <$EMAIL>"
+GIT_NAME="$(git config --get user.name)"
+GIT_EMAIL="$(git config --get user.email)"
+COPYRIGHT="Copyright (c) $YEAR, $GIT_NAME <$GIT_EMAIL>"
 
 test "$1" != "--sh-setup" &&
 . "$(git boots --sh-setup)"
