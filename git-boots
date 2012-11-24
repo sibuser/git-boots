@@ -1,25 +1,19 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
-year="$(date +%Y)"
-author="$(git config --get user.name)"
-email="$(git config --get user.email)"
+sh_setup () {
+    echo "$(dirname $(readlink -e $0))/git-utils"
+}
 
-test "$1" = "--sh-setup" &&
-echo $(dirname $(readlink -e $0))/git-utils
+clean () {
+    sed -i 's/\t/    /g' "$@"
+    sed -i 's/[ \t]*$//g' "$@"
+}
 
-test "$1" == "--clean" &&
-shift &&
-for file in "$@"
-do
-    sed -i 's/\t/    /g' $file
-    sed -i 's/[ \t]*$//g' $file
-done
-
-test "$1" == "--copyright" &&
-shift &&
-for file in "$@"
-do
+copyright () {
+    year="$(date +%Y)"
+    author="$(git config --get user.name)"
+    email="$(git config --get user.email)"
     sed -i -n "
 1 {
 # read extra line
@@ -42,5 +36,23 @@ do
 1 ! {
     p
 }
-" $file
-done
+" "$@"
+}
+
+case "$1" in
+    --sh-setup)
+        shift
+        sh_setup "$@"
+        ;;
+    --clean)
+        shift
+        clean "$@"
+        ;;
+    --copyright)
+        shift
+        copyright "$@"
+        ;;
+    *)
+        error "Invalid argument"
+        exit 1
+esac
