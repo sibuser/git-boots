@@ -123,6 +123,6 @@ case "$1" in
         boots_dir "$@"
         ;;
     *)
-        die "Invalid argument"
-        exit 1
+        usage
+        ;;
 esac
