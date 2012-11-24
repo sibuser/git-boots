@@ -32,6 +32,8 @@ test "$(git --version)" != "git version 1.8.0" &&
     die "Update your git to 1.8.0"
 
 # must be before --help option check
+help_file="$(dirname $(readlink -e $0))/$(basename $0).help"
+test -f "$help_file" &&
 . "$(dirname $(readlink -e $0))/$(basename $0).help"
 
 # must be before git-sh-setup is sourced
