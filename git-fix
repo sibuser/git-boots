@@ -1,5 +1,8 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+#
+# TODO stash recovery doesn't work
+#
 
 . "$(git boots --sh-setup)"
 
