@@ -6,7 +6,8 @@ $(basename $0) search
 $(basename $0) dig
 $(basename $0) clean|bury
 $(basename $0) list
-$(basename $0) apply [<trash>]
+$(basename $0) apply <trash>
+$(basename $0) show <trash>
 --
  Available options are
 h,help            Show help

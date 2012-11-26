@@ -3,7 +3,6 @@
 #
 # TODO trash_save is too complex, dig stash commits instead
 # TODO better dig progress output (add subject?)
-# TODO trash_show ~ git stash show
 # TODO trash_drop ~ git stash drop
 # TODO trash_branch ~ git stash branch
 # TODO write help & usage
@@ -57,6 +56,11 @@ trash_list () {
 # apply trash commit
 trash_apply () {
     git stash apply "$@"
+}
+
+# show trash commit
+trash_show () {
+    git show "$@"
 }
 
 # save to trash
@@ -140,6 +144,10 @@ case "$1" in
     apply)
         shift
         trash_apply "$@"
+        ;;
+    show)
+        shift
+        trash_show "$@"
         ;;
     save)
         shift
