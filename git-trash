@@ -14,19 +14,7 @@ ref_stash="refs/stash"
 ref_trash="refs/heads/trash"
 regex_trash="^TRASH"
 
-err () {
-    echo "$1" 1>&2
-}
-
-die () {
-    err "$1"
-    exit 1
-}
-
-# stash size
-stash_size () {
-    echo $(git stash list | wc -l)
-}
+. "$(git boots --sh-setup)"
 
 # search for trash
 trash_search () {
@@ -74,7 +62,7 @@ trash_apply () {
 # save to trash
 trash_save () {
     # remember stash size before
-    before=$(stash_size)
+    before=$(boots_stash_size)
 
     # try to stash
     args=$(git rev-parse --sq-quote "$@")
@@ -82,7 +70,7 @@ trash_save () {
     eval "$command" >/dev/null || die "Failed to stash!"
 
     # remember stash size after
-    after=$(stash_size)
+    after=$(boots_stash_size)
 
     # stash size didn't change, nothing to trash
     test $after -eq $before && die "No local changes to trash!"
@@ -121,6 +109,15 @@ HEAD is now at $(git log --no-walk --format='%h %s' HEAD -- )"
 
 set -e
 
+while getopts "" flag; do
+    case $flag in
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
 test $# -eq 0 && set "save" "$@"
 
 case "$1" in
@@ -149,6 +146,6 @@ case "$1" in
         trash_save "$@"
         ;;
     *)
-        die "Invalid command!"
+        die "Invalid command: $1"
         ;;
 esac
