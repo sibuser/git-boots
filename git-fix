@@ -25,9 +25,9 @@ test -z "$commit" && usage
 git commit --fixup=$commit
 
 # stash if working tree is dirty
-before=$(stash_size)
+before=$(boots_stash_size)
 git stash &>/dev/null
-after=$(stash_size)
+after=$(boots_stash_size)
 if $after -gt $before
 then
     echo "Stashed your changes."

@@ -13,7 +13,7 @@ no_flags () {
     echo "$@"
 }
 
-stash_size () {
+boots_stash_size () {
     echo $(git stash list | wc -l)
 }
 
