@@ -22,16 +22,16 @@ boots_require_non_detached_head
 
 case $# in
     1)
-	master=master
-	topic="$1"
-	;;
+        master=master
+        topic="$1"
+        ;;
     2)
-	master="$1"
-	topic="$2"
-	;;
+        master="$1"
+        topic="$2"
+        ;;
     *)
-	usage
-	;;
+        usage
+        ;;
 esac
 
 boots_require_branch "$master" "Invalid <master> branch name."
