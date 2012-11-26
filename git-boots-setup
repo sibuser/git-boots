@@ -1,0 +1,53 @@
+#!/bin/bash
+# Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+GIT_NAME="$(git config --get user.name)"
+GIT_EMAIL="$(git config --get user.email)"
+GIT_COPYRIGHT="Copyright (c) $(date +%Y), $GIT_NAME <$GIT_EMAIL>"
+
+help () {
+    "$0" -h
+    test -n "$LONG_USAGE" && echo "$LONG_USAGE"
+    exit 0
+}
+
+# must be before --help option check
+help_file="$(dirname $(readlink -e $0))/$(basename $0).help"
+test -f "$help_file" &&
+. "$(dirname $(readlink -e $0))/$(basename $0).help"
+
+# must be before git-sh-setup is sourced
+for opt in "$@"; do
+    test "$opt" = "--help" && help
+done
+
+. "$(git --exec-path)/git-sh-setup"
+
+say () {
+    echo -e "$@" | sed '/^boots: / ! s/^/boots: /' 1>&2
+}
+
+err () {
+    say "$@" 1>&2
+}
+
+die () {
+    err "$@" && exit ${2:-1}
+}
+
+require () {
+    for func in "$@"; do
+        if ! type -t "$func" >/dev/null; then
+            die "Missing required git builtin bash function: $func"
+        fi
+    done
+}
+
+# check that usage was imported from git-sh-setup
+require usage
+
+# include boots tools
+. "$(dirname $(readlink -e $0))/git-boots-tools"
+
+# some scripts rely on 1.8.0 functionality (or used to, I'm not sure)
+boots_require_git_version 1.8.0

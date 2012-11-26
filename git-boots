@@ -42,7 +42,7 @@ boots_dir () {
 }
 
 sh_setup () {
-    echo "$(boots_dir)/git-utils"
+    echo "$(boots_dir)/git-boots-setup"
 }
 
 aliases_setup () {

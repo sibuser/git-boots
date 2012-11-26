@@ -1,16 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
-GIT_NAME="$(git config --get user.name)"
-GIT_EMAIL="$(git config --get user.email)"
-GIT_COPYRIGHT="Copyright (c) $(date +%Y), $GIT_NAME <$GIT_EMAIL>"
-
-help () {
-    "$0" -h
-    test -n "$LONG_USAGE" && echo "$LONG_USAGE"
-    exit 0
-}
-
 no_flags () {
     while getopts "" flag; do
         case $flag in
@@ -25,15 +15,6 @@ no_flags () {
 
 stash_size () {
     echo $(git stash list | wc -l)
-}
-
-require () {
-    for func in "$@"; do
-        if ! type -t "$func" >/dev/null; then
-            err "Missing git builtin bash function: $func"
-            exit 1
-        fi
-    done
 }
 
 boots_current_branch () {
@@ -72,34 +53,12 @@ boots_require_can_ff () {
 }
 
 boots_require_git_version () {
-    test "$(git --version)" = "git version $1" || die "Update your git to $1"
-}
+    test "$(git --version)" = "git version $1" || die "Update your git to $1.
+Here is how you can do it:
 
-# some scripts rely on 1.8.0 functionality
-boots_require_git_version 1.8.0
-
-# must be before --help option check
-help_file="$(dirname $(readlink -e $0))/$(basename $0).help"
-test -f "$help_file" &&
-. "$(dirname $(readlink -e $0))/$(basename $0).help"
-
-# must be before git-sh-setup is sourced
-for opt in "$@"; do
-    test "$opt" = "--help" && help
-done
-
-. "$(git --exec-path)/git-sh-setup"
-
-require usage
-
-say () {
-    echo -e "$@" | sed '/^boots: / ! s/^/boots: /' 1>&2
-}
-
-err () {
-    say "$@" 1>&2
-}
-
-die () {
-    err "$@" && exit ${2:-1}
+$ git clone git://github.com/git/git.git ~/git
+$ cd ~/git
+$ git checkout v1.8.0
+$ make prefix=/usr/local all
+$ sudo make prefix=/usr/local install"
 }
