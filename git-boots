@@ -50,14 +50,14 @@ aliases_setup () {
         sed '/^[ \t]*(#|$)/ d' | \
         while read line;
     do
-        alias=$(echo "$line"   | awk '{print $1}')
-        command=$(echo "$line" | awk '{$1="";print}')
-        if git config --get alias.$alias >/dev/null
+        alias="$(echo "$line"   | awk '{print $1}')"
+        command="$(echo "$line" | awk '{$1="";print}')"
+        if git config --get alias."$alias" >/dev/null
         then
             err "git-$alias is already set, skip"
             continue
         fi
-        git config "$@" alias."$alias" "\"$command\""
+        git config "$@" alias."$alias" "${command## }"
         say "git-$alias is set"
     done
 }
