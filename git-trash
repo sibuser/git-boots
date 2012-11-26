@@ -10,6 +10,7 @@
 # TODO filter out commits with the same tree?
 #
 
+ref_stash="refs/stash"
 ref_trash="refs/heads/trash"
 regex_trash="^TRASH"
 
@@ -87,7 +88,7 @@ trash_save () {
     test $after -eq $before && die "No local changes to trash!"
 
     # remember stash
-    stash=$(git rev-parse refs/stash)
+    stash=$(git rev-parse $ref_stash)
 
     # drop stash
     git stash drop &>/dev/null
