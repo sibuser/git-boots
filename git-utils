@@ -36,9 +36,12 @@ require () {
     done
 }
 
+boots_require_git_version () {
+    test "$(git --version)" = "git version $1" || die "Update your git to $1"
+}
+
 # some scripts rely on 1.8.0 functionality
-test "$(git --version)" != "git version 1.8.0" &&
-    die "Update your git to 1.8.0"
+boots_require_git_version 1.8.0
 
 # must be before --help option check
 help_file="$(dirname $(readlink -e $0))/$(basename $0).help"
