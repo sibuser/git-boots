@@ -33,8 +33,7 @@ trash_bury () {
 
 # dig for trash
 trash_dig () {
-    trash_search | \
-        while read commit
+    trash_search | while read commit
     do
         subject="$(git log --no-walk --format='%s' $commit --)"
         git update-ref -m "$subject" $ref_trash $commit
