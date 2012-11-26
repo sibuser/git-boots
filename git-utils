@@ -36,6 +36,41 @@ require () {
     done
 }
 
+boots_current_branch () {
+    ref="$(git rev-parse -q --verify --symbolic-full-name HEAD)"
+    echo "${ref//refs\/heads\//}"
+}
+
+boots_is_detached_head () {
+    test "$(boots_current_branch)" = "HEAD"
+}
+
+boots_require_non_detached_head () {
+    (! boots_is_detached_head) || die "\
+You are in 'detached HEAD' state. Please get out of it e.g. you can do it by checking out any branch."
+}
+
+boots_require_clean_work_tree () {
+    require_clean_work_tree "execute $(basename $0)" "Commit or stash your changes and try again."
+}
+
+boots_require_branch () {
+    test -z $1 && die "Empty argument"
+    ref="refs/heads/${1//refs\/heads\//}"
+    git show-ref -q --verify -- "$ref" || die "$1 is not a valid branch. $2"
+}
+
+boots_require_upstream () {
+    boots_require_branch "$1"
+    (git config --get branch."$1".remote >/dev/null &&
+        git config --get branch."$1".merge >/dev/null) || die "$1 doesn't have proper upstream set. $2"
+}
+
+boots_require_can_ff () {
+    count=$(git cherry $1 $2 | awk '/\+/' | wc -l)
+    test "$count" = "0" || die "Can't fast-forward from $1 to $2. $3"
+}
+
 boots_require_git_version () {
     test "$(git --version)" = "git version $1" || die "Update your git to $1"
 }
