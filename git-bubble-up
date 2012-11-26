@@ -1,0 +1,67 @@
+#!/bin/bash
+
+. "$(git boots --sh-setup)"
+
+while getopts "v" flag; do
+    case $flag in
+        v)
+            verbose="$verbose --verbose"
+            ;;
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+orig_branch="$(boots_current_branch)"
+say "Your current branch is '$orig_branch'"
+
+boots_require_clean_work_tree
+boots_require_non_detached_head
+
+case $# in
+    1)
+	master=master
+	topic="$1"
+	;;
+    2)
+	master="$1"
+	topic="$2"
+	;;
+    *)
+	usage
+	;;
+esac
+
+boots_require_branch "$master" "Invalid <master> branch name."
+boots_require_branch "$topic" "Invalid <topic> branch name."
+
+boots_require_upstream "$master" "<master> doesn't have upstream branch set."
+
+upstream_remote="$(git config --get branch.$master.remote)"
+upstream_branch_ref="$(git config --get branch.$master.merge)"
+upstream_branch="${upstream_branch_ref//refs\/heads\//}"
+
+say "Fetching new changes from '$upstream_remote' '$upstream_branch_ref'..."
+git fetch $verbose $upstream_remote \
+    $upstream_branch_ref:refs/remotes/$upstream_remote/$upstream_branch
+
+boots_require_can_ff refs/remotes/$upstream_remote/$upstream_branch $master "
+Your local $master has local not yet pushed commits."
+
+say "Rebasing '$master' on '$upstream_remote/$upstream_branch'..."
+git rebase $verbose \
+    refs/remotes/$upstream_remote/$upstream_branch \
+    $master
+
+say "Rebasing '$topic' on '$master'..."
+git rebase $verbose \
+    $master \
+    $topic
+
+if test "$orig_branch" != "$topic"
+then
+    say "Rolling back to the original branch..."
+    git checkout $orig_branch --
+fi

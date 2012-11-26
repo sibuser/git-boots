@@ -1,0 +1,43 @@
+#
+# TODO git-bubble-up master topic/* # using regexp
+# TODO git-bubble-up --prune master topic/* # prune branches that ff'ed
+#
+
+OPTIONS_SPEC=$(cat << EOF
+$(basename $0) [<master>] <topic>
+--
+ Available options are
+h,help            Show help
+v,verbose         Be verbose
+EOF
+)
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE=$(cat << EOF
+DESCRIPTION
+
+Lets you automate process of rebasing your branch on top of freshly updated master
+branch.
+
+That what script conceptually does:
+
+        \$ git checkout master
+        \$ git pull --rebase origin master # only if ff
+        \$ git checkout topic
+        \$ git rebase master # probably solve conflicts
+
+Nevertheless you can use this script as it will automatically solve some issues
+that happens again and again for some git users.
+
+EXAMPLES
+
+    Rebase topic on top of freshly updated master (master is the default upstream branch)
+
+        \$ $(basename $0) topic
+
+    Rebase topic on top of freshly updated develop
+
+        \$ $(basename $0) develop topic
+EOF
+)
