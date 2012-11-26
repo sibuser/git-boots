@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 #
 # TODO git-bubble-up master topic/* # using regexp
 # TODO git-bubble-up --prune master topic/* # prune branches that ff'ed
