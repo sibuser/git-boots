@@ -1,8 +1,4 @@
-#
-# TODO git-bubble-up master topic/* # using regexp
-# TODO git-bubble-up --prune master topic/* # prune branches that ff'ed
-#
-
+#!/bin/bash
 OPTIONS_SPEC=$(cat << EOF
 $(basename $0) [<master>] <topic>
 --
