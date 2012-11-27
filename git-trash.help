@@ -1,9 +1,13 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
-OPTIONS_SPEC=$(cat << EOF
+
+OPTIONS_SPEC=
+SUBDIRECTORY_OK=yes
+
+USAGE=$(cat << EOF
 $(basename $0) [save]
-$(basename $0) search
-$(basename $0) dig
+$(basename $0) search [--trash|--stash]
+$(basename $0) dig [--trash|--stash]
 $(basename $0) clean|bury
 $(basename $0) list
 $(basename $0) apply <trash>
@@ -12,9 +16,9 @@ $(basename $0) show <trash>
  Available options are
 h,help            Show help
 v,verbose         Be verbose
+trash             Search/dig for trash commits
+stash             Search/dig for stash commits
 EOF
 )
 
-SUBDIRECTORY_OK=yes
-USAGE=
 LONG_USAGE=

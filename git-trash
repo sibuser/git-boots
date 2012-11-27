@@ -12,14 +12,22 @@
 ref_stash="refs/stash"
 ref_trash="refs/heads/trash"
 regex_trash="^TRASH"
+regex_stash="\(^WIP on\)\|\(^On\)"
 
 . "$(git boots --sh-setup)"
 
 # search for trash
 trash_search () {
+    regex=
+    for opt in "$@"
+    do
+	test "$opt" = "--stash" && regex="$regex${regex:+\|}\($regex_stash\)"
+	test "$opt" = "--trash" && regex="$regex${regex:+\|}\($regex_trash\)"
+    done
+    test -z "$regex" && regex="$regex_trash"
     git fsck --no-progress --unreachable | \
         awk '/commit/ {print $3}' | \
-        git rev-list --reverse --stdin --no-walk --grep="$regex_trash" --not HEAD --
+        git rev-list --reverse --stdin --no-walk --grep="$regex" --not HEAD --
 }
 
 # bury trash back, does it smell?
@@ -33,7 +41,7 @@ trash_bury () {
 
 # dig for trash
 trash_dig () {
-    trash_search | while read commit
+    trash_search "$@" | while read commit
     do
         subject="$(git log --no-walk --format='%s' $commit --)"
         git update-ref -m "$subject" $ref_trash $commit
