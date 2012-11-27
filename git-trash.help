@@ -6,8 +6,8 @@ SUBDIRECTORY_OK=yes
 
 USAGE=$(cat << EOF
 $(basename $0) [save]
-$(basename $0) search [--trash|--stash]
-$(basename $0) dig [--trash|--stash]
+$(basename $0) search [--[no-]trash||--[no-]stash]
+$(basename $0) dig    [--[no-]trash||--[no-]stash]
 $(basename $0) clean|bury
 $(basename $0) list
 $(basename $0) apply <trash>
@@ -17,7 +17,9 @@ $(basename $0) show <trash>
 h,help            Show help
 v,verbose         Be verbose
 trash             Search/dig for trash commits
+no-trash          Neutralize any previously provided --trash flag
 stash             Search/dig for stash commits
+no-stash          Neutralize any previously provided --stash flag
 EOF
 )
 

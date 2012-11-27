@@ -17,13 +17,28 @@ regex_stash="\(^WIP on\)\|\(^On\)"
 
 # search for trash
 trash_search () {
-    regex=
+    search_trash=
+    search_stash=
     for opt in "$@"
     do
-	test "$opt" = "--stash" && regex="$regex${regex:+\|}\($regex_stash\)"
-	test "$opt" = "--trash" && regex="$regex${regex:+\|}\($regex_trash\)"
+	case "$opt" in
+	    --stash)
+		search_stash=yes
+		;;
+	    --no-stash)
+		search_stash=
+		;;
+	    --trash)
+		search_trash=yes
+		;;
+	    --no-trash)
+		search_trash=
+		;;
+	esac
     done
-    test -z "$regex" && regex="$regex_trash"
+    regex=
+    test -n "$search_trash" && regex="${regex:+$regex\|}\($regex_trash\)"
+    test -n "$search_stash" && regex="${regex:+$regex\|}\($regex_stash\)"
     # progress is written to stderr, so doesn't interfer
     git fsck --unreachable | \
         awk '/commit/ {print $3}' | \
