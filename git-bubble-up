@@ -69,6 +69,6 @@ git rebase $verbose \
 
 if test "$orig_branch" != "$topic"
 then
-    say "Rolling back to the original branch..."
-    git checkout $orig_branch --
+    say "Rolling back to the original branch '$orig_branch'..."
+    git checkout -q $orig_branch --
 fi
