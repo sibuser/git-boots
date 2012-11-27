@@ -37,6 +37,23 @@ shift $((OPTIND - 1))
 EOF
 )
 
+GIT_TEMPLATE_HELP=$(cat << EOS
+#!/bin/bash
+
+OPTIONS_SPEC=\$(cat << EOF
+\$(basename \$0) [options]
+--
+ Available options are
+h,help           show help
+EOF
+)
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE=
+EOS
+)
+
 boots_dir () {
     test -z $BOOTS_DIR && BOOTS_DIR="$(dirname $(which git-boots))"
     echo "$BOOTS_DIR"
@@ -98,6 +115,10 @@ template () {
     echo "$GIT_TEMPLATE"
 }
 
+template_help () {
+    echo "$GIT_TEMPLATE_HELP"
+}
+
 # TODO add todo to the custom file
 boots_todo() {
     awk '/TODO/ && !/awk/ {printf "%-12s : %s\n", FILENAME, $0}' $(ls "$(git boots --dir)")
@@ -124,6 +145,10 @@ case "$1" in
         shift
         template "$@"
         ;;
+    --template-help)
+	shift
+	template_help "$@"
+	;;
     --dir)
         shift
         boots_dir "$@"
