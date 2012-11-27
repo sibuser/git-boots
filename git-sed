@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+# TODO take commits from stdin (mimic sed behaviour)
 
 . "$(git boots --sh-setup)"
 require require_clean_work_tree
