@@ -2,7 +2,6 @@
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 #
 # TODO trash_save is too complex, dig stash commits instead
-# TODO better dig progress output (add subject?)
 # TODO trash_drop ~ git stash drop
 # TODO trash_branch ~ git stash branch
 # TODO write help & usage
@@ -25,7 +24,8 @@ trash_search () {
 	test "$opt" = "--trash" && regex="$regex${regex:+\|}\($regex_trash\)"
     done
     test -z "$regex" && regex="$regex_trash"
-    git fsck --no-progress --unreachable | \
+    # progress is written to stderr, so doesn't interfer
+    git fsck --unreachable | \
         awk '/commit/ {print $3}' | \
         git rev-list --reverse --stdin --no-walk --grep="$regex" --not HEAD --
 }
