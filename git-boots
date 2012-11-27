@@ -27,13 +27,13 @@ set -e
 # a  - simple
 # b: - with arg (\$OPTARG)
 while getopts "" flag; do
-    case $flag in
+    case \$flag in
         :|\?)
             usage
             ;;
     esac
 done
-shift $((OPTIND - 1))
+shift \$((OPTIND - 1))
 EOF
 )
 
