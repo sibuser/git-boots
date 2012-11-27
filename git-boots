@@ -38,7 +38,8 @@ EOF
 )
 
 boots_dir () {
-    echo "$(dirname $(readlink -e $0))"
+    test -z $BOOTS_DIR && BOOTS_DIR="$(dirname $(which git-boots))"
+    echo "$BOOTS_DIR"
 }
 
 sh_setup () {
