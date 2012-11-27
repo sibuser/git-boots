@@ -17,7 +17,7 @@ DESCRIPTION
 Lets you automate process of rebasing your branch on top of freshly updated master
 branch.
 
-That what script conceptually does:
+Thats what script conceptually does:
 
         \$ git checkout master
         \$ git pull --rebase origin master # only if ff
