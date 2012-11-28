@@ -1,0 +1,2 @@
+git-foreach <path> <cmd>    - perform some action for every repository under specified path
+git-bury <upstream> <regex> - bury branches that are completely merged upstream
