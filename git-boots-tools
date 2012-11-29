@@ -18,8 +18,8 @@ boots_stash_size () {
 }
 
 boots_current_branch () {
-    ref="$(git rev-parse -q --verify --symbolic-full-name HEAD)"
-    echo "${ref//refs\/heads\//}"
+    ref="$(git symbolic-ref -q --short HEAD)"
+    echo "${ref:-HEAD}"
 }
 
 boots_is_detached_head () {
