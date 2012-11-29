@@ -19,8 +19,6 @@ case $# in
         ;;
 esac
 
-test -z "$commit" && usage
-
 # create fixup commit
 git commit --fixup=$commit
 
