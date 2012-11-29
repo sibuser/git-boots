@@ -1,8 +1,5 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
-#
-# TODO stash recovery doesn't work
-#
 
 . "$(git boots --sh-setup)"
 
@@ -26,7 +23,7 @@ git commit --fixup=$commit
 before=$(boots_stash_size)
 git stash &>/dev/null
 after=$(boots_stash_size)
-if $after -gt $before
+if test $after -gt $before
 then
     echo "Stashed your changes."
     stash="yes"
