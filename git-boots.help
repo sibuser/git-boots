@@ -8,6 +8,7 @@ $(basename $0) [options]
 h,help          show help
 sh-setup        shell setup
 aliases-setup   aliases setup
+env-check       environment sanity check
 clean           clean files
 copyright       update copyright
 template        generate script template

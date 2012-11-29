@@ -80,6 +80,11 @@ aliases_setup () {
     done
 }
 
+env_check () {
+    git config --get user.name  >/dev/null || die "Please set user.name: git config --global user.name \"John Doe\""
+    git config --get user.email >/dev/null || die "Please set user.email: git config --global user.email john.doe@site.com"
+}
+
 clean () {
     sed -i 's/\t/    /g' "$@"
     sed -i 's/[ \t]*$//g' "$@"
@@ -125,6 +130,10 @@ boots_todo() {
 }
 
 case "$1" in
+    --env-check)
+        shift
+        env_check "$@"
+        ;;
     --sh-setup)
         shift
         sh_setup "$@"
