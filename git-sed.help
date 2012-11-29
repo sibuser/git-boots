@@ -2,6 +2,7 @@
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
 OPTIONS_SPEC=$(cat << EOF
+$(basename $0) [options] <sed-script> -
 $(basename $0) [options] <sed-script> <rev-list options>...
 --
  Available options are
@@ -29,7 +30,27 @@ But be carefull about any mini scripts with special symbols. But if you are
 using sed you probably know what I'm talking about.
 
 For more information about <rev-list options> check git-filter-branch as it will
-be passed as-is to git-filter-branch.
+be passed as-is to git-filter-branch except the case when it's empty or equal
+to '-'.
+
+If <rev-list options> is empty than nothing happens. This is something counter
+to the git-filter-branch original behaviour. The only reason is to protect
+user from accidently rewriting *whole* history. If you really want it - use
+git-filter-branch directly.
+
+If <rev-list options> is equal to '-' than an attempt to read from stdin is
+made. Every line will be interpted as parameters for an extra invocation e.g.
+following commands do exactly the same:
+
+    \$ git sed 's/foo/bar/'
+    \$ echo "" | git sed 's/foo/bar/' -
+
+    \$ git sed 's/foo/bar/' HEAD~10..HEAD
+    \$ echo "HEAD~10..HEAD" | git sed 's/foo/bar/' -
+
+    \$ git sed 's/foo/bar/' HEAD~20..HEAD~10
+    \$ git sed -f 's/foo/bar/' HEAD~5..HEAD
+    \$ echo -e "HEAD~20..HEAD~10\nHEAD~5..HEAD" | git sed -f 's/foo/bar/' -
 
 BACKUP
 
