@@ -56,9 +56,16 @@ boots_require_git_version () {
     test "$(git --version)" = "git version $1" || die "Update your git to $1.
 Here is how you can do it:
 
+(sudo apt-get install libcurl4-dev libexpat-dev)
+
 $ git clone git://github.com/git/git.git ~/git
 $ cd ~/git
 $ git checkout v1.8.0
 $ make prefix=/usr/local all
-$ sudo make prefix=/usr/local install"
+$ sudo make prefix=/usr/local install
+
+(sudo apt-get install asciidoc xmlto xmltoman)
+
+$ make prefix=/usr/local doc
+$ sudo make prefix=/usr/local install-doc"
 }
