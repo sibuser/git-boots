@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+# TODO what if <topic> is optional? this way we mimic git-rebase
 OPTIONS_SPEC=$(cat << EOF
 $(basename $0) [<master>] <topic>
 --
