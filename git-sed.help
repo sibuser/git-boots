@@ -39,8 +39,8 @@ user from accidently rewriting *whole* history. If you really want it - use
 git-filter-branch directly.
 
 If <rev-list options> is equal to '-' than an attempt to read from stdin is
-made. Every line will be interpted as parameters for an extra invocation e.g.
-following commands do exactly the same:
+made. All lines will be concatenated and the result line will be used as a
+paramter to invocation e.g. the following commands do exactly the same:
 
     \$ git sed 's/foo/bar/'
     \$ echo "" | git sed 's/foo/bar/' -
@@ -50,6 +50,7 @@ following commands do exactly the same:
 
     \$ git sed 's/foo/bar/' HEAD~20..HEAD~10
     \$ git sed -f 's/foo/bar/' HEAD~5..HEAD
+    \$ echo -e "HEAD~20..HEAD~10  HEAD~5..HEAD" | git sed -f 's/foo/bar/' -
     \$ echo -e "HEAD~20..HEAD~10\nHEAD~5..HEAD" | git sed -f 's/foo/bar/' -
 
 BACKUP
