@@ -27,8 +27,8 @@ boots_require_non_detached_head
 
 case $# in
     1)
-        master=master
-        topic="$1"
+        master="$1"
+        topic="$(boots_current_branch)"
         ;;
     2)
         master="$1"

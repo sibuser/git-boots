@@ -1,8 +1,8 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
-# TODO what if <topic> is optional? this way we mimic git-rebase
+
 OPTIONS_SPEC=$(cat << EOF
-$(basename $0) [<master>] <topic>
+$(basename $0) <master> [<topic>]
 --
  Available options are
 h,help            Show help
@@ -28,14 +28,19 @@ Thats what script conceptually does:
 Nevertheless you can use this script as it will automatically solve some issues
 that happens again and again for some git users.
 
+Script tries to mimic git-rebase argument order i.e.
+
+    \$ git-rebase develop       -> \$ $(basename $0) develop
+    \$ git-rebase develop topic -> \$ $(basename $0) develop topic
+
 EXAMPLES
 
-    Rebase topic on top of freshly updated master (master is the default upstream branch)
+    Rebase current branch on top of freshly updated master
 
-        \$ $(basename $0) topic
+        \$ $(basename $0) master
 
-    Rebase topic on top of freshly updated develop
+    Rebase topic branch on top of freshly updated master
 
-        \$ $(basename $0) develop topic
+        \$ $(basename $0) master topic
 EOF
 )
