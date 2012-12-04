@@ -20,10 +20,10 @@ branch.
 
 Thats what script conceptually does:
 
-        \$ git checkout master
-        \$ git pull --rebase origin master # only if ff
-        \$ git checkout topic
-        \$ git rebase master # probably solve conflicts
+    \$ git checkout master
+    \$ git pull --rebase origin master # only if ff
+    \$ git checkout topic
+    \$ git rebase master # probably solve conflicts
 
 Nevertheless you can use this script as it will automatically solve some issues
 that happens again and again for some git users.
