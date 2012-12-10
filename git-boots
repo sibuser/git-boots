@@ -80,6 +80,7 @@ aliases_setup () {
     done
 }
 
+# TODO check about rerere, it should be enabled too
 env_check () {
     git config --get user.name  >/dev/null || die "Please set user.name: git config --global user.name \"John Doe\""
     git config --get user.email >/dev/null || die "Please set user.email: git config --global user.email john.doe@site.com"
