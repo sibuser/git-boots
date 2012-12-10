@@ -1,3 +1,4 @@
 git-foreach <path> <cmd>    - perform some action for every repository under specified path
 git-bury <upstream> <regex> - bury branches that are completely merged upstream
 git-automove                - detect moved files & update index if any
+git-author                  - reset committer & author in specified commits
