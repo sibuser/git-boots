@@ -1,0 +1,110 @@
+#!/bin/bash
+# Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+. "$(git boots --sh-setup)"
+
+set -e
+
+trap boots_cleanup EXIT
+
+function boots_cleanup () {
+    rm -f "$BOOTS_INDEX_FILE"
+    rm -f "$BOOTS_REGEX_FILE"
+}
+
+BOOTS_DEFAULT_INDEX_FILE="$GIT_DIR/.git-boots-index"
+BOOTS_DEFAULT_REGEX_FILE="$GIT_DIR/.git-boots-regex"
+
+# a  - simple
+# b: - with arg ($OPTARG)
+while getopts "s:p:f:" flag; do
+    case $flag in
+        f)
+            BOOTS_REGEX_FILE="$OPTARG"
+            # TODO bail out if file doesn't exist
+            ;;
+        s)
+            BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT; $OPTARG"
+            ;;
+        p)
+            BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT;
+# prefix first line only
+1 {
+    # not yet prefixed
+    /^$OPTARG/ ! {
+        s/^/$OPTARG/
+    }
+}
+"
+            ;;
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+: ${BOOTS_INDEX_FILE:="$BOOTS_DEFAULT_INDEX_FILE"}
+: ${BOOTS_REGEX_FILE:="$BOOTS_DEFAULT_REGEX_FILE"}
+
+boots_require_clean_work_tree
+
+if test "$BOOTS_DEFAULT_REGEX_FILE" = "$BOOTS_REGEX_FILE"
+then
+    # TODO check number of arguments
+    echo "$1" > "$BOOTS_REGEX_FILE"
+    shift
+fi
+
+# TODO bail out if any merges
+
+echo "" > "$BOOTS_INDEX_FILE"
+
+BOOTS_INDEX_FILE="$BOOTS_INDEX_FILE" \
+BOOTS_REGEX_FILE="$BOOTS_REGEX_FILE" \
+BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT" \
+git filter-branch -f --commit-filter '
+# proposed tree
+tree="$1"
+
+# parent commit
+parent="$3"
+
+# changed files
+changed_files="$(git diff-tree $parent $tree -r --name-only)"
+
+# matched files
+matched_files="$(git diff-tree $parent $tree -r --name-only | grep -f $BOOTS_REGEX_FILE)"
+
+# test if commit is OK
+if test -z "$matched_files"
+then
+    git commit-tree "$@"
+    return $? # done
+fi
+
+# test if commit has *only* matched files
+if test "$matched_files" = "$changed_files"
+then
+    sed -r "$BOOTS_SED_SCRIPT" | git commit-tree "$@"
+    return $? # done
+fi
+
+# checkout original tree
+GIT_INDEX_FILE=$BOOTS_INDEX_FILE git read-tree $tree
+
+# revert changes to create tree without them
+git diff $parent $tree -- $matched_files | GIT_INDEX_FILE=$BOOTS_INDEX_FILE git apply --cached -R
+
+# create tree without changes
+tree_without_changes=$(GIT_INDEX_FILE=$BOOTS_INDEX_FILE git write-tree)
+
+# commit without changes
+commit_without_changes=$(git commit-tree $tree_without_changes -p $parent)
+
+# create the original commit
+git rev-list -1 $commit_without_changes --format=%B |
+    sed "1 d" |
+    sed -r "$BOOTS_SED_SCRIPT" |
+    git commit-tree $tree -p $commit_without_changes
+' "$@"

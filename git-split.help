@@ -1,0 +1,30 @@
+#!/bin/bash
+
+OPTIONS_SPEC=$(cat << EOF
+$(basename $0) [options] <pattern> [<rev-list options>...]
+$(basename $0) [options] -f <file> [<rev-list options>...]
+--
+ Available options are
+f,file=          file to take regexps from
+p,prefix=        prefix to add to extracted commits' messages
+s,sed=           sed script to execute on extracted commits' messages
+h,help           show help
+EOF
+)
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE=$(cat << EOF
+DESCRIPTION
+
+    Lets you split commits on per-path basis.
+
+EXAMPLES
+
+    \$ $(basename $0) 'foo' HEAD
+        Split history for paths matching foo regexp.
+
+    \$ $(basename $0) -f foo HEAD
+        Split history for paths matching regexps from file foo.
+EOF
+)
