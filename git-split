@@ -11,18 +11,16 @@ trap boots_cleanup EXIT
 
 function boots_cleanup () {
     rm -f "$BOOTS_DEFAULT_INDEX_FILE"
-    rm -f "$BOOTS_DEFAULT_REGEX_FILE"
 }
 
 BOOTS_DEFAULT_INDEX_FILE="$GIT_DIR/.git-boots-index"
-BOOTS_DEFAULT_REGEX_FILE="$GIT_DIR/.git-boots-regex"
 
 # a  - simple
 # b: - with arg ($OPTARG)
 while getopts "s:p:f:" flag; do
     case $flag in
         f)
-            BOOTS_REGEX_FILE="$OPTARG"
+            BOOTS_GREP_OPTS="-f $(readlink -e $OPTARG)"
             # TODO bail out if file doesn't exist
             ;;
         s)
@@ -47,23 +45,17 @@ done
 shift $((OPTIND - 1))
 
 : ${BOOTS_INDEX_FILE:="$BOOTS_DEFAULT_INDEX_FILE"}
-: ${BOOTS_REGEX_FILE:="$BOOTS_DEFAULT_REGEX_FILE"}
 
 boots_require_clean_work_tree
 
-if test "$BOOTS_DEFAULT_REGEX_FILE" = "$BOOTS_REGEX_FILE"
-then
-    # TODO check number of arguments
-    echo "$1" > "$BOOTS_REGEX_FILE"
-    shift
-fi
+: ${BOOTS_GREP_OPTS:="\"$1\""}
 
 # TODO bail out if any merges
 
 echo "" > "$BOOTS_INDEX_FILE"
 
 BOOTS_INDEX_FILE="$BOOTS_INDEX_FILE" \
-BOOTS_REGEX_FILE="$BOOTS_REGEX_FILE" \
+BOOTS_GREP_OPTS=" $BOOTS_GREP_OPTS"  \
 BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT" \
 git filter-branch -f --commit-filter '
 # proposed tree
@@ -76,7 +68,7 @@ parent="$3"
 changed_files="$(git diff-tree $parent $tree -r --name-only)"
 
 # matched files
-matched_files="$(git diff-tree $parent $tree -r --name-only | grep -f $BOOTS_REGEX_FILE)"
+matched_files="$(git diff-tree $parent $tree -r --name-only | grep $BOOTS_GREP_OPTS)"
 
 # test if commit is OK
 if test -z "$matched_files"
