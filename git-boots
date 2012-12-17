@@ -127,7 +127,11 @@ template_help () {
 
 # TODO add todo to the custom file
 boots_todo() {
+    # from scripts
     awk '/TODO/ && !/awk/ {printf "%-12s : %s\n", FILENAME, $0}' $(ls "$(git boots --dir)")
+    # from TODO
+    cat $(git boots --dir)/TODO |
+    awk '                 {printf "%-12s : %s\n", "TODO"  , $0}'
 }
 
 case "$1" in
