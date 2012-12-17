@@ -57,8 +57,8 @@ then
     shift
 fi
 
-test "$(git rev-list --count --min-parents=2)" != "0" &&
-    die "You have merges in your rev-list options. No can do."
+# must be after shift
+boots_require_no_merges "$@"
 
 echo "" > "$BOOTS_INDEX_FILE"
 
