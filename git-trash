@@ -21,20 +21,20 @@ trash_search () {
     search_stash=
     for opt in "$@"
     do
-	case "$opt" in
-	    --stash)
-		search_stash=yes
-		;;
-	    --no-stash)
-		search_stash=
-		;;
-	    --trash)
-		search_trash=yes
-		;;
-	    --no-trash)
-		search_trash=
-		;;
-	esac
+        case "$opt" in
+            --stash)
+                search_stash=yes
+                ;;
+            --no-stash)
+                search_stash=
+                ;;
+            --trash)
+                search_trash=yes
+                ;;
+            --no-trash)
+                search_trash=
+                ;;
+        esac
     done
     regex=
     test -n "$search_trash" && regex="${regex:+$regex\|}\($regex_trash\)"

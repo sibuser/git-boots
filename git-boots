@@ -160,9 +160,9 @@ case "$1" in
         template "$@"
         ;;
     --template-help)
-	shift
-	template_help "$@"
-	;;
+        shift
+        template_help "$@"
+        ;;
     --dir)
         shift
         boots_dir "$@"
