@@ -5,8 +5,6 @@
 
 . "$(git boots --sh-setup)"
 
-set -e
-
 trap boots_cleanup EXIT
 
 function boots_cleanup () {
@@ -20,8 +18,10 @@ BOOTS_DEFAULT_INDEX_FILE="$GIT_DIR/.git-boots-index"
 while getopts "s:p:f:F" flag; do
     case $flag in
         f)
-            BOOTS_GREP_OPTS="-f $(readlink -e $OPTARG)"
-            # TODO bail out if file doesn't exist
+            file="$OPTARG"
+            test ! -f "$file" && die "File '$file' doesn't exist"
+
+            BOOTS_GREP_OPTS="-f $(readlink -e $file)"
             ;;
         F)
             BOOTS_GREP_OPTS="$BOOTS_GREP_OPTS -F"
