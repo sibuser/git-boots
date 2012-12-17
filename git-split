@@ -17,11 +17,14 @@ BOOTS_DEFAULT_INDEX_FILE="$GIT_DIR/.git-boots-index"
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "s:p:f:" flag; do
+while getopts "s:p:f:F" flag; do
     case $flag in
         f)
             BOOTS_GREP_OPTS="-f $(readlink -e $OPTARG)"
             # TODO bail out if file doesn't exist
+            ;;
+        F)
+            BOOTS_GREP_OPTS="$BOOTS_GREP_OPTS -F"
             ;;
         s)
             BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT; $OPTARG"

@@ -5,10 +5,11 @@ $(basename $0) [options] <pattern> [<rev-list options>...]
 $(basename $0) [options] -f <file> [<rev-list options>...]
 --
  Available options are
-f,file=          file to take regexps from
-p,prefix=        prefix to add to extracted commits' messages
-s,sed=           sed script to execute on extracted commits' messages
-h,help           show help
+F,fixed-strings     interpret file patterns as fixed strings
+f,file=             file to take file patterns from
+p,prefix=           prefix to add to extracted commits' messages
+s,sed=              sed script to execute on extracted commits' messages
+h,help              show help
 EOF
 )
 
