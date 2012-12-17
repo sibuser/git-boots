@@ -51,7 +51,11 @@ shift $((OPTIND - 1))
 
 boots_require_clean_work_tree
 
-: ${BOOTS_GREP_OPTS:="\"$1\""}
+if test -z "$BOOTS_GREP_OPTS"
+then
+    BOOTS_GREP_OPTS="\"$1\""
+    shift
+fi
 
 # TODO bail out if any merges
 
