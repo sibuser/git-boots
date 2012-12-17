@@ -10,8 +10,8 @@ set -e
 trap boots_cleanup EXIT
 
 function boots_cleanup () {
-    rm -f "$BOOTS_INDEX_FILE"
-    rm -f "$BOOTS_REGEX_FILE"
+    rm -f "$BOOTS_DEFAULT_INDEX_FILE"
+    rm -f "$BOOTS_DEFAULT_REGEX_FILE"
 }
 
 BOOTS_DEFAULT_INDEX_FILE="$GIT_DIR/.git-boots-index"
