@@ -18,14 +18,20 @@ USAGE=
 LONG_USAGE=$(cat << EOF
 DESCRIPTION
 
-    Lets you split commits on per-path basis.
+Lets you split commits based on file patterns. Every commit that touches
+files matching provided patterns will be split to two commits: with and
+without changes in matched files.
 
 EXAMPLES
 
-    \$ $(basename $0) 'foo' HEAD
-        Split history for paths matching foo regexp.
+\$ $(basename $0) 'foo' master..topic
+    Split history for paths matching foo regexp.
 
-    \$ $(basename $0) -f foo HEAD
-        Split history for paths matching regexps from file foo.
+\$ $(basename $0) -f foo master..topic
+   Split history for paths matching regexps from file foo.
+
+\$ $(basename $0) -F -f foo master..topic
+    Split history for paths matching patterns from file foo, treat them as
+    fixed strings.
 EOF
 )
