@@ -13,6 +13,16 @@ no_flags () {
     echo "$@"
 }
 
+boots_require_non_unique_ref () {
+    (git show-ref --hash | uniq -c -d | grep -q $(git rev-parse "$1")) ||
+        die "Provided reference '$1' is unique!"
+}
+
+boots_require_no_merges () {
+    test "$(git rev-list --count --min-parents=2 $@)" != "0" &&
+        die "You have merges in your rev-list options. No can do."
+}
+
 boots_stash_size () {
     echo $(git stash list | wc -l)
 }
