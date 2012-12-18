@@ -12,7 +12,7 @@ JIRA_PREFIX_REGEXP="|[A-Z]+-[0-9]+"
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "dsfr:" flag; do
+while getopts "d:sfr:" flag; do
     case $flag in
         s)
             delete="yes"
