@@ -5,7 +5,7 @@
 # TODO trash_drop ~ git stash drop
 # TODO trash_branch ~ git stash branch
 # TODO write help & usage
-# TODO filter out commits with the same tree?
+# TODO filter out commits with the same tree? (how to determine the best?)
 #
 
 ref_stash="refs/stash"
