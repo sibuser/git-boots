@@ -1,0 +1,85 @@
+#!/bin/bash
+# Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+OPTIONS_SPEC=$(cat << EOF
+$(basename $0) [options] <prefix> <rev-list options>...
+$(basename $0) [options] -d <prefix> <rev-list options>...
+$(basename $0) [options] -s <rev-list options>...
+--
+ Available options are
+h,help            show help
+d,delete=         delete <prefix>
+s,strip-off-all   delete all recognized prefixes
+f,force           pass --force to git-filter-branch
+ Advanced
+r,regexp=         extra <regexp> to recognized prefixes
+EOF
+)
+
+SUBDIRECTORY_OK=yes
+USAGE=
+
+LONG_USAGE=$(cat << EOF
+DESCRIPTION
+
+Lets you rewrite git revision history by rewriting the branches mentioned in the
+<rev-list options>, applying predefined prefix filters. You can either prefix
+every message or remove prefix from every message.
+
+This script won't touch commits where messages are already prefixed with
+provided <prefix>, <regexp> or any of the following predetermined prefix regular
+expressions:
+
+$(for p in ${GIT_PREFIX_REGEXP//|/ } ${ZIDS_PREFIX_REGEXP//|/ }; do echo $p; done)
+
+For more information about <rev-list options> check git-filter-branch as it will
+be passed as-is to git-filter-branch.
+
+BACKUP
+
+Before any history rewrite git creates backup. If you try to rewrite
+topic history it will create backup reference:
+
+        refs/original/refs/heads/topic
+
+If you are not satisfied with the result you can always reset your
+changes:
+
+        \$ git checkout topic
+        \$ git reset --hard refs/original/refs/heads/topic
+
+If you wish you can always manually delete backup:
+
+        \$ git update-ref -d refs/original/refs/heads/topic
+
+Don't ever manually delete backup refs from .git using 'rm' command even if
+somebody in the Internet says so - always use git-update-ref!
+
+EXAMPLES
+
+\$ $(basename $0) YG-666 master..yg/666
+    Prefix with YG-666.
+
+\$ $(basename $0) -f YG-666 master..yg/666
+    Prefix with YG-666, drop previous refs/origin backup.
+
+\$ $(basename $0) -d YG-666 master..yg/666
+    Delete prefix YG-666.
+
+\$ $(basename $0) -d 'WIP:?' master..yg/666
+    Delete prefix by regexp 'WIP:?'.
+
+\$ $(basename $0) -s master..yg/666
+    Delete all recognized prefixes.
+
+ADVANCED EXAMPLES
+
+\$ $(basename $0) -r 'WIP:?' YG-666 master..yg/666
+    Prefix with YG-666, add extra regexp 'WIP:?' as recognized prefix
+    regexp so commits matching this prefix regexp won't be altered.
+
+\$ $(basename $0) -r 'WIP:?' -s master..yg/666
+    Delete all recognized prefixes, add extra regexp 'WIP:?' as recognized prefix
+    regexp so commits matching this prefix regexp won't be altered.
+EOF
+)

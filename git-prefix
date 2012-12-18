@@ -1,0 +1,99 @@
+#!/bin/bash
+# Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+#
+# TODO simplify prefixes conjunction, it's awkward!
+#
+
+. "$(git boots --sh-setup)"
+
+# TODO get rid off these pipes, regexp per line?
+GIT_PREFIX_REGEXP="|Merge|Revert|squash!|fixup!"
+JIRA_PREFIX_REGEXP="|[A-Z]+-[0-9]+"
+
+# a  - simple
+# b: - with arg ($OPTARG)
+while getopts "dsfr:" flag; do
+    case $flag in
+        s)
+            delete="yes"
+            delete_all="yes"
+            ;;
+        r)
+            user_prefixes="|$OPTARG"
+            ;;
+        d)
+            delete="yes"
+            delete_prefix="$OPTARG"
+            ;;
+        f)
+            force="-f"
+            ;;
+        :)
+            usage
+            ;;
+        \?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if test $# -eq 0
+then
+    usage
+fi
+
+# add prefix should be first argument when in non-delete mode
+if test -z "$delete"
+then
+    add_prefix="$1"
+    test -z "$add_prefix" && usage
+    shift
+fi
+
+# rest of the arguments is passed to filter-branch as is
+rev_args="$@"
+test -z "$rev_args" && usage
+
+prefixes_to_skip="$add_prefix$GIT_PREFIX_REGEXP$JIRA_PREFIX_REGEXP$user_prefixes"
+
+if test ! -z "$delete_all"
+then
+    prefixes_to_delete="$delete_prefix$user_prefixes$JIRA_PREFIX_REGEXP"
+else
+    prefixes_to_delete="$delete_prefix$user_prefixes"
+fi
+
+if test ! -z "$delete"
+then
+    git filter-branch $force --msg-filter "
+sed -n -r \"
+    # prefix could be only on the first line
+    1 {
+        # delete prefixes if any
+        s/^($prefixes_to_delete):? //
+        p
+    }
+    # print other lines
+    1 ! {
+        p
+    }
+\" " $rev_args
+    exit 0
+fi
+
+git filter-branch $force --msg-filter "
+sed -n -r \"
+    # prefix could be only on the first line
+    1 {
+        # prefix not yet prefixed
+        /^($prefixes_to_skip)/ ! {
+            s/^/$add_prefix /
+        }
+        p
+    }
+    # print other lines
+    1 ! {
+        p
+    }
+\" " $rev_args
