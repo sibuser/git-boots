@@ -27,6 +27,14 @@ EXAMPLES
 \$ $(basename $0) 'foo' master..topic
     Split history for paths matching foo regexp.
 
+\$ $(basename $0) -p "FOO: " 'foo' master..topic
+    Split history for paths matching foo regexp and prefix extracted
+    commits with "FOO: ".
+
+\$ $(basename $0) -s "1 s/^/FOO: /" 'foo' master..topic
+    Split history for paths matching foo regexp and execute provided
+    sed script on extracted commits' messages.
+
 \$ $(basename $0) -f foo master..topic
    Split history for paths matching regexps from file foo.
 
