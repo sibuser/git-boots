@@ -71,7 +71,7 @@ sed -n -r \"
     # prefix could be only on the first line
     1 {
         # delete prefixes if any
-        s/^($prefixes_to_delete):? //
+        s/^($prefixes_to_delete):? *//
         p
     }
     # print other lines
