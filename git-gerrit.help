@@ -7,7 +7,7 @@ $(basename $0) [options] <rev-list options>...
 h,help              show help
 create-change-id    generate Change-Id
 delete-change-id    remove Change-Id
-recreate-chagne-id  recreate Change-Id
+recreate-change-id  recreate Change-Id
 EOF
 )
 
