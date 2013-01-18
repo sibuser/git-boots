@@ -22,6 +22,7 @@ delete_change_id () {
 
 create_change_id() {
     git_dir="$(readlink -e $(git rev-parse --git-dir))"
+    # copy-pasted from somewhere
     git filter-branch --msg-filter "
 cat > $$
 $git_dir/hooks/commit-msg $$
