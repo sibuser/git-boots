@@ -1,0 +1,16 @@
+#!/bin/bash
+
+OPTIONS_SPEC=$(cat << EOF
+$(basename $0) [options] <rev-list options>...
+--
+ Available options are
+h,help              show help
+create-change-id    generate Change-Id
+delete-change-id    remove Change-Id
+recreate-chagne-id  recreate Change-Id
+EOF
+)
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE=
