@@ -70,7 +70,7 @@ Here is how you can do it:
 
 $ git clone git://github.com/git/git.git ~/git
 $ cd ~/git
-$ git checkout v1.8.0
+$ git checkout v$1
 $ make prefix=/usr/local all
 $ sudo make prefix=/usr/local install
 
