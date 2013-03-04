@@ -4,19 +4,18 @@
 test "$1" != "--sh-setup" &&
 . "$(git boots --sh-setup)"
 
-GIT_ALIASES=$(cat << EOF
+GIT_ALIASES="\
 append          commit --amend -C HEAD
 last            log -n 1
 index           diff --cached
 incoming        log ...@{u}
 outgoing        log @{u}...
-new             log $1@{1}..$1@{0}
+new             !sh -c 'git log \$1@{1}..\$1@{0} "\$@"'
 empty-tree-sha1 hash-object -t tree /dev/null
-stash-unapply   git stash show -p | git apply -R
-EOF
-)
+stash-unapply   git stash show -p | git apply -R"
 
-GIT_TEMPLATE=$(cat << EOF
+template () {
+cat << EOF
 #!/bin/bash
 # $GIT_COPYRIGHT
 
@@ -35,9 +34,10 @@ while getopts "" flag; do
 done
 shift \$((OPTIND - 1))
 EOF
-)
+}
 
-GIT_TEMPLATE_HELP=$(cat << EOS
+template_help () {
+cat << EOS
 #!/bin/bash
 
 OPTIONS_SPEC=\$(cat << EOF
@@ -52,7 +52,7 @@ SUBDIRECTORY_OK=yes
 USAGE=
 LONG_USAGE=
 EOS
-)
+}
 
 boots_dir () {
     test -z $BOOTS_DIR && BOOTS_DIR="$(dirname $(which git-boots))"
@@ -115,14 +115,6 @@ copyright () {
     p
 }
 " "$@"
-}
-
-template () {
-    echo "$GIT_TEMPLATE"
-}
-
-template_help () {
-    echo "$GIT_TEMPLATE_HELP"
 }
 
 # TODO add todo to the custom file
