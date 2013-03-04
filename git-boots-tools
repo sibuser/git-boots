@@ -45,6 +45,21 @@ boots_require_clean_work_tree () {
     require_clean_work_tree "execute $(basename $0)" "Commit or stash your changes and try again."
 }
 
+boots_require_commit () {
+    test -z "$1" && die "Empty argument"
+    (
+        test $(git cat-file -e "$1") 2>/dev/null
+        test $(git cat-file -t "$1") == "commit"
+    ) || die "Not a commit: $1"
+
+    # sha1="$(git rev-parse $1)"
+    # (
+    #     test $(echo "$sha1" | wc -l) -eq 1
+    #     test $(git cat-file -e "$sha1") 2>/dev/null
+    #     test $(git cat-file -t "$sha1") == "commit"
+    # ) || die "Not a commit: $1"
+}
+
 boots_require_branch () {
     test -z $1 && die "Empty argument"
     ref="refs/heads/${1//refs\/heads\//}"
