@@ -20,7 +20,7 @@ do
 s/  */ /g   # remove all repeating spaces, who does  this?
 s/^ *//     # remove leading spaces
 s/ *$//     # remove trailing spaces
-s/^.*: *//  # strip off manually specified prefixes, people lie
+s/^.*:  *// # strip off manually specified prefixes, people lie
 s/^./\U&\E/ # capitalize first letter
 s/\.$//     # remove dot, noise it is
 }')
