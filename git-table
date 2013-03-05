@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+# TODO search for JIRA in the subject & body
 rev_list="$@"
 test -z "$rev_list" && rev_list=HEAD
 
