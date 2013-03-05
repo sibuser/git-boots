@@ -1,0 +1,31 @@
+#!/bin/bash -e
+
+git rev-list $@ | while read commit
+do
+  # prefixes will have list of touched first level directories ordered by amount of changes
+  prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}')
+
+  subject=$(git rev-list --format="%s" $commit^! | sed -e '1 d' -e 's/"//g' -e "s/'//g")
+
+  jira=$(echo $subject | grep -o '[A-Z][A-Z]*-[0-9][0-9]*'; exit 0) # ok to fail
+  if test -n "$jira"; then
+    subject=$(echo $subject | sed "s/$jira//")
+  fi
+
+  subject=$(echo $subject | sed '1 {
+s/  */ /g   # remove all repeating spaces, who does  this?
+s/^ *//     # remove leading spaces
+s/ *$//     # remove trailing spaces
+s/^.*: *//  # strip off manually specified prefixes, people lie
+s/^./\U&\E/ # capitalize first letter
+s/\.$//     # remove dot, noise it is
+}')
+  if test -n "$prefixes"; then
+    prefixes=$(echo "["$prefixes"]")
+  fi
+  author=$(git rev-list --format=%ae $commit^! | sed -e '1 d' -e 's/@.*//')
+  author=$(printf "%-12s\n" $author)
+  jira=$(  printf "%-10s\n" $jira)
+  git log --format="%C(magenta)$jira%C(reset) %C(cyan)$author%C(reset) %C(yellow)%h%C(reset) $subject %C(cyan)$prefixes%C(reset)%C(green)%d%C(reset)" $commit^!
+done | less -RFiK
+
