@@ -30,6 +30,7 @@ s/\.$//     # remove dot, noise it is
   author=$(git rev-list --format=%ae $commit^! | sed -e '1 d' -e 's/@.*//')
   author=$(printf "%-12s\n" $author)
   jira=$(  printf "%-10s\n" $jira)
-  git log --format="%C(magenta)$jira%C(reset) %C(cyan)$author%C(reset) %C(yellow)%h%C(reset) $subject %C(cyan)$prefixes%C(reset)%C(green)%d%C(reset)" $commit^!
+  prefixes=$( printf "%-18s\n" "$prefixes")
+  git log --format="%C(magenta)$jira%C(reset) %C(cyan)$author%C(reset) %C(cyan)$prefixes%C(reset) %C(yellow)%h%C(reset) $subject %C(green)%d%C(reset)" $commit^!
 done | less -RFiK
 
