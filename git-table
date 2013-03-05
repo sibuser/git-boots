@@ -1,6 +1,9 @@
 #!/bin/bash -e
 
-git rev-list $@ | while read commit
+rev_list="$@"
+test -z "$rev_list" && rev_list=HEAD
+
+git rev-list $rev_list | while read commit
 do
   # prefixes will have list of touched first level directories ordered by amount of changes
   prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}')
