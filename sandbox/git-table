@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+JIRA_REGEXP='[A-Z][A-Z]*-[0-9][0-9]*'
+
 # TODO search for JIRA in the subject & body
 rev_list="$@"
 test -z "$rev_list" && rev_list=HEAD
@@ -11,7 +13,7 @@ do
 
   subject=$(git rev-list --format="%s" $commit^! | sed -e '1 d' -e 's/"//g' -e "s/'//g")
 
-  jira=$(echo $subject | grep -o '[A-Z][A-Z]*-[0-9][0-9]*'; exit 0) # ok to fail
+  jira=$(echo $subject | grep -o "$JIRA_REGEXP"; exit 0) # ok to fail
   if test -n "$jira"; then
     subject=$(echo $subject | sed "s/$jira//")
   fi
