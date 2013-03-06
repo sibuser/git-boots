@@ -1,18 +1,17 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
-OPTIONS_SPEC=$(cat << EOF
+OPTIONS_SPEC="
 $(basename $0) <upstream> [<branch>...]
 --
  Available options are
 h,help            Show help
 v,verbose         Be verbose
-EOF
-)
+"
 
 SUBDIRECTORY_OK=yes
 USAGE=
-LONG_USAGE=$(cat << EOF
+LONG_USAGE="
 DESCRIPTION
 
 Lets you automate process of rebasing your <branch> on top of freshly updated
@@ -47,6 +46,5 @@ EXAMPLES
     Rebase all branches matching topic/* on top of freshly updated master
 
         \$ $(basename $0) master topic/*
+"
 
-EOF
-)
