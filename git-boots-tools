@@ -27,6 +27,18 @@ boots_stash_size () {
     echo $(git stash list | wc -l)
 }
 
+boots_find_branches () {
+    if boots_is_branch "$@"
+    then
+        echo "$@"
+    else
+        for regex in "$@"
+        do
+            git rev-parse --symbolic-full-name --branches="$regex"
+        done | sed s:refs/heads/::g
+    fi
+}
+
 boots_current_branch () {
     ref="$(git symbolic-ref -q --short HEAD)"
     echo "${ref:-HEAD}"
@@ -60,10 +72,22 @@ boots_require_commit () {
     # ) || die "Not a commit: $1"
 }
 
-boots_require_branch () {
+boots_is_branch () {
     test -z $1 && die "Empty argument"
     ref="refs/heads/${1//refs\/heads\//}"
-    git show-ref -q --verify -- "$ref" || die "$1 is not a valid branch. $2"
+    git show-ref -q --verify -- "$ref"
+}
+
+boots_require_branch () {
+    boots_is_branch "$1" || die "$1 is not a valid branch."
+}
+
+boots_require_branches () {
+    test $# -eq 0 && die "No arguments"
+    for br in ${@:1:$(($#-1))}
+    do
+        boots_require_branch "$br"
+    done
 }
 
 boots_require_upstream () {
