@@ -97,7 +97,7 @@ boots_require_upstream () {
 }
 
 boots_require_can_ff () {
-    count=$(git cherry $1 $2 | awk '/\+/' | wc -l)
+    count=$(git cherry $1 $2 | grep -c '^\+')
     test "$count" = "0" || die "Can't fast-forward from $1 to $2. $3"
 }
 
