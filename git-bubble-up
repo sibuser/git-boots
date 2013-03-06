@@ -47,8 +47,6 @@ upstream_remote="$(git config --get branch.$master.remote)"
 upstream_branch_ref="$(git config --get branch.$master.merge)"
 upstream_branch="${upstream_branch_ref//refs\/heads\//}"
 
-set -e
-
 say "Fetching new changes from '$upstream_remote' '$upstream_branch_ref'..."
 git fetch $verbose $upstream_remote \
     $upstream_branch_ref:refs/remotes/$upstream_remote/$upstream_branch
