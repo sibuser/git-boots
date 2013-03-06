@@ -1,7 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 #
-# TODO git-bubble-up master topic/* # using regexp
 # TODO git-bubble-up --prune master topic/* # prune branches that ff'ed
 #
 
@@ -28,11 +27,11 @@ boots_require_non_detached_head
 case $# in
     1)
         master="$1"
-        topic="$(boots_current_branch)"
+        branches="$(boots_current_branch)"
         ;;
     2)
         master="$1"
-        topic="$2"
+        branches="$(boots_find_branches $2)"
         ;;
     *)
         usage
@@ -40,7 +39,7 @@ case $# in
 esac
 
 boots_require_branch "$master" "Invalid <master> branch name."
-boots_require_branch "$topic" "Invalid <topic> branch name."
+boots_require_branches "$branches" "Invalid <branches> branches' names."
 
 boots_require_upstream "$master" "<master> doesn't have upstream branch set."
 
@@ -62,12 +61,15 @@ git rebase $verbose \
     refs/remotes/$upstream_remote/$upstream_branch \
     $master
 
-say "Rebasing '$topic' on '$master'..."
-git rebase $verbose \
-    $master \
-    $topic
+for branch in $branches
+do
+    say "Rebasing '$branch' on '$master'..."
+    git rebase $verbose \
+        $master \
+        $branch
+done
 
-if test "$orig_branch" != "$topic"
+if test "$orig_branch" != "$branches"
 then
     say "Rolling back to the original branch '$orig_branch'..."
     git checkout -q $orig_branch --

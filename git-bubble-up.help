@@ -2,7 +2,7 @@
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
 OPTIONS_SPEC=$(cat << EOF
-$(basename $0) <upstream> [<branch>]
+$(basename $0) <upstream> [<branch>...]
 --
  Available options are
 h,help            Show help
@@ -43,5 +43,10 @@ EXAMPLES
     Rebase topic branch on top of freshly updated master
 
         \$ $(basename $0) master topic
+
+    Rebase all branches matching topic/* on top of freshly updated master
+
+        \$ $(basename $0) master topic/*
+
 EOF
 )
