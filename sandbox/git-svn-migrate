@@ -1,0 +1,118 @@
+#!/bin/bash -x
+
+# This script is written to automate process of importing svn history
+# to git & stripping off some parts of the repository.
+
+help() {
+    echo "usage: $(basename $0) -u <url> -b <branch> -r <rev> -o <output dir> [-s <dir>] [-d <dirs>] [-h]"
+}
+
+while getopts "u:b:r:o:hs:d:" flag; do
+    case $flag in
+        u)
+            URL="$OPTARG"
+            echo "url: $URL"
+            ;;
+        b)
+            BRANCH="$OPTARG"
+            echo "branch: $BRANCH"
+            ;;
+        r)
+            REV="$OPTARG"
+            echo "revision: $REV"
+            ;;
+        o)
+            OUTPUTDIR="$OPTARG"
+            echo "outputdir: $OUTPUTDIR"
+            ;;
+        s)
+            SUBDIR="$OPTARG"
+            echo "subdir: $SUBDIR"
+            ;;
+        d)
+            DELDIR="$OPTARG"
+            echo "deldir: $DELDIR"
+            ;;
+        h)
+            help
+            exit 0
+            ;;
+        :)
+            help
+            exit 1
+            ;;
+        \?)
+            help
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z $URL ]; then help; exit 1; fi
+if [ -z $BRANCH ]; then help; exit 1; fi
+if [ -z $REV ]; then help; exit 1; fi
+if [ -z $OUTPUTDIR ]; then help; exit 1; fi
+
+# construct directory name
+CLONEDIR=$BRANCH@$REV
+
+# making git-svn clone is *very* slow so we will clone it only if we
+# haven't cloned it before (don't touch these clones)
+(test -d $CLONEDIR || git init --bare $CLONEDIR)
+
+# update git-svn clone
+pushd $CLONEDIR > /dev/null
+
+git config svn-remote.$BRANCH.url $URL
+git config svn-remote.$BRANCH.fetch branches/$BRANCH:refs/remotes/$BRANCH
+git svn fetch $BRANCH -r$REV
+
+# fetch the rest until HEAD
+git svn fetch $BRANCH
+
+# forcefully (re)create local branch (so we can clone it)
+git branch -f $BRANCH remotes/$BRANCH
+
+# git-svn updated, popd
+popd > /dev/null
+
+# simulate git clone --single-branch
+git init --bare $OUTPUTDIR
+pushd $OUTPUTDIR > /dev/null
+git fetch ../$CLONEDIR refs/heads/$BRANCH:refs/heads/$BRANCH
+git symbolic-ref HEAD refs/heads/$BRANCH
+popd > /dev/null
+
+# futher work on repo
+pushd $OUTPUTDIR > /dev/null
+
+if [ ! -z "$SUBDIR" ]; then
+    echo "narrow repository to $SUBDIR"
+
+    # narrow repository to subdir
+    git filter-branch --prune-empty --subdirectory-filter $SUBDIR -- --all
+
+    # no need for backup
+    rm -f refs/original/refs/heads/$BRANCH
+fi
+
+if [ ! -z "$DELDIR" ]; then
+    echo "prune $DELDIR from repository"
+
+    # delete specified
+    git filter-branch --prune-empty --tree-filter "rm -rf $DELDIR" $BRANCH
+
+    # no need for backup
+    rm -f refs/original/refs/heads/$BRANCH
+fi
+
+# clean reflog (just in case)
+git reflog expire --all --expire=now
+
+# repack aggressive
+git gc --prune=now --aggressive
+
+# done
+popd > /dev/null
+
+echo "Done!"

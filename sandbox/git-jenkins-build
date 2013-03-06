@@ -1,0 +1,231 @@
+#!/bin/bash
+#
+# Run a build for the specified configuration on specific public repository's
+# branch.
+#
+
+jenkins_base_url="http://ci.local.zenterio.com:8080"
+jenkins_configs_all="
+git_ZEN_NAVI_BCM7230_configurable
+git_ZEN_NAVI_BCM7405_configurable
+git_ZEN_NAVI_BCM7301_configurable
+git_ZEN_NAVI_MSTARK2_configurable
+"
+
+# Note that we are placing .jenkins files in the priority order i.e. the fist
+# file is the file with the most priority e.g. $HOME/.jenkins is the last as has
+# the least priority.
+
+if [ -f "$HOME/.jenkins" ]; then
+    jenkins_files="$HOME/.jenkins"
+fi
+
+if [ -f ".jenkins" ]; then
+    jenkins_files="./.jenkins $jenkins_files"
+fi
+
+for jenkins_file in $jenkins_files;
+do
+    if [ -z "$jenkins_username" ]; then
+        jenkins_username="$(   cat $jenkins_file | sed -r -n 's/^username:(.+)$/\1/ p')"
+    fi
+
+    if [ -z "$jenkins_password" ]; then
+        jenkins_password="$(   cat $jenkins_file | sed -r -n 's/^password:(.+)$/\1/ p')"
+    fi
+
+    if [ -z "$jenkins_api_token" ]; then
+        jenkins_api_token="$(  cat $jenkins_file | sed -r -n 's/^api_token:(.+)$/\1/ p')"
+    fi
+
+    if [ -z "$jenkins_configs" ]; then
+        jenkins_configs="$(    cat $jenkins_file | sed -r -n 's/^configs:(.+)$/\1/ p')"
+    fi
+
+    if [ -z "$jenkins_repo_prefix" ]; then
+        jenkins_repo_prefix="$(cat $jenkins_file | sed -r -n 's/^prefix:(.+)$/\1/ p')"
+    fi
+done
+
+OPTIONS_SPEC="\
+$(basename $0) [options] <[target=]repo:branch>...
+--
+ Available options are
+h,help               show help
+c,config=            jenkins configs
+a,all                all jenkins configs
+ Credentials
+u,username=          jenkins username
+p,password=          jenkins password
+t,api-token=         jenkins api token
+"
+USAGE=
+LONG_USAGE="\
+DESCRIPTION
+
+Lets you start configurable jenkins job from the commandline. You either specify
+the configs to use or just start all predetermined with --all flag.
+
+CREDENTIALS
+
+You must provide valid credentials either in commandline or configuration
+file. If you provide credentials in command line don't forget to properly quote
+them.
+
+CONFIGURATION FILE
+
+You can specify any of username/password/api_token/configs/prefix in .jenkins
+file. It's a simple ini file e.g.
+
+username:john_doe
+password:0xcafebabe
+api_token:31415926535897932384626433832795
+configs:git_ZEN_NAVI_BCM7230_configurable git_ZEN_NAVI_BCM7405_configurable
+prefix:user-john-doe-public-
+
+.jenkins will be searched first in the current directory and in \$HOME directory
+if not found. The configuration will be applied as you expect e.g. ./.jenkins
+will override anything specified in \$HOME/.jenkins.
+
+Any options specified in command line will override any configuration read from
+this file.
+
+EXAMPLES
+
+    Build for all predefined configurations:
+
+        \$ $(basename $0) -a user-john-doe-public-develop:develop
+
+    Build for a single configuration only:
+
+        \$ $(basename $0) -c git_ZEN_NAVI_BCM7230_configurable \\
+            user-john-doe-public-develop:develop
+
+    Build for a single configuration with prefix:user-john-doe-public- specified
+    in .jenkins (don't be confused as first develop is a repo suffix and the
+    later is a branch name):
+
+        \$ $(basename $0) -c git_ZEN_NAVI_BCM7230_configurable \\
+            develop:develop
+
+    Build for a single configuration only and override targethw_yuxing also
+    (note that zids= is optional):
+
+        \$ $(basename $0) -c git_ZEN_NAVI_BCM7230_configurable \\
+            user-john-doe-public-develop:develop \\
+            targethw_yuxing=user-john-doe-public-targethw_yuxing:develop
+
+        \$ $(basename $0) -c git_ZEN_NAVI_BCM7230_configurable \\
+            zids=user-john-doe-public-develop:develop \\
+            targethw_yuxing=user-john-doe-public-targethw_yuxing:develop
+
+    Build for several configurations (either quote the whole list or use comma
+    to separate):
+
+        \$ $(basename $0) -c \"git_ZEN_NAVI_BCM7230_configurable \\
+            git_ZEN_NAVI_BCM7405_configurable\" user-john-doe-public-develop:develop
+
+        \$ $(basename $0) -c \\
+            git_ZEN_NAVI_BCM7230_configurable,git_ZEN_NAVI_BCM7405_configurable \\
+            user-john-doe-public-develop:develop
+
+    Build all configurations, override .jenkins:
+
+        \$ $(basename $0) -u jane-doe -p 0xdeadbeef -t 27182818284590452353602874713526 -a \\
+            user-john-doe-public-develop:develop
+"
+. $(dirname $(readlink -e $0))/git-zids-utils
+
+while getopts "u:p:t:c:a" flag; do
+    case $flag in
+        u)
+            jenkins_username="$OPTARG"
+            ;;
+        p)
+            jenkins_password="$OPTARG"
+            ;;
+        t)
+            jenkins_api_token="$OPTARG"
+            ;;
+        c)
+            jenkins_configs="$OPTARG"
+            ;;
+        a)
+            jenkins_configs="$jenkins_configs_all"
+            ;;
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [ $# -eq 0 ]; then
+    usage
+fi
+
+specs="$@"
+
+test -z "$jenkins_username"  && die "username is empty"
+test -z "$jenkins_password"  && die "password is empty"
+test -z "$jenkins_api_token" && die "api token is empty"
+test -z "$jenkins_configs"   && die "configs are empty"
+test -z "$specs"             && die "spec list is empty"
+
+jenkins_wget="wget -O /dev/null
+--auth-no-challenge
+--http-user=$jenkins_username
+--http-password=$jenkins_password"
+
+jenkins_configs=${jenkins_configs//,/ }
+
+override=""
+for spec in $specs; do
+    cfg=($(echo $spec | sed -r -n "s/(([a-zA-Z0-9_-]+)=)?([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)/\2 \3 \4/ p"))
+
+    if [ ${#cfg[@]} -eq 3 ]; then
+        repo_target="${cfg[0]}"
+        repo_name="${cfg[1]}"
+        repo_branch="${cfg[2]}"
+    else
+        if [ ${#cfg[@]} -eq 2 ]; then
+            repo_target=zids
+            repo_name="${cfg[0]}"
+            repo_branch="${cfg[1]}"
+        else
+            die "invalid spec: $spec"
+        fi
+    fi
+
+    if [ -z "$repo_name" ]; then
+        die "repo name is empty, spec is invalid: $spec"
+    fi
+
+    if [ -z "$repo_branch" ]; then
+        die "branch name is empty, spec is invalid: $spec"
+    fi
+
+    override="$override $repo_target $jenkins_repo_prefix$repo_name $repo_branch"
+done
+
+# trim leading/trailing spaces
+override="$(echo $override)"
+
+echo "#"
+echo "# username : $jenkins_username"
+echo "# configs  : $(for config in $jenkins_configs; do echo -n "$config "; done;)"
+echo "# specs    : $(for spec in $specs; do echo -n "$spec "; done;)"
+echo "# override : $override"
+echo "#"
+
+for config in $jenkins_configs; do
+    echo -n "submitting $config..."
+    output=$($jenkins_wget \
+        $jenkins_base_url/job/$config/buildWithParameters?token=$jenkins_api_token\&CUSTOM_OVERRIDES="$override" 2>&1)
+    if [ $? -eq 0 ]; then
+        echo "SUCCESS!"
+    else
+        echo "FAIL!"
+        echo -e "\n$output\n"
+    fi
+done

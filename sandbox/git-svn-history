@@ -1,0 +1,81 @@
+#!/bin/bash
+
+#
+# This script will automatically fetch all legacy svn history and magically
+# enable it for you repository.
+#
+# The best part is that enabling this history is completely optional and *won't*
+# change any hash for any commits you already have. Just enable it and enjoy
+# full history back to 2002.
+#
+# For more information about 'git replace' use man pages 'git help replace' or
+# read detailed example at http://git-scm.com/2010/03/17/replace.html
+#
+
+history_repo_url=ssh://git@reposerver.local.zenterio.com/user-alexander-public-history
+
+echo "sanity checks..."
+if [ "$(basename $(pwd))" = "zids" ]; then
+    echo "within zids...OK"
+else
+    echo "within zids...FAIL"
+    exit 1
+fi
+
+if [ "$(git rev-list -1 INITIAL_IMPORT)" = "58f91e4ec8ac5d6f701d417880055a26406bf6d4" ]; then
+    echo "repo check...OK"
+else
+    echo "repo check...FAIL"
+    exit 1
+fi
+
+(git remote | grep history > /dev/null)
+if [ "$?" != "0" ]; then
+    echo "adding history repository: $history_repo_url..."
+    git remote add history $history_repo_url
+fi
+
+echo "deleting all history tags..."
+for tag in $(git tag | sed -n '/history\// p')
+do
+    echo "$tag"
+    git tag -d $tag > /dev/null
+done
+
+echo "detecting history tags..."
+tags=""
+for tag in $(git ls-remote --tags history history/* | awk '{print $2}' | sort); # sort just for fun
+do
+    echo "$tag"
+    tags="$tags +$tag:$tag"
+done;
+
+echo "fetching history tags..."
+git fetch history $tags
+
+echo "reseting replaces..."
+for commit in $(git replace -l);
+do
+    git replace -d $commit;
+done;
+
+before=$(git rev-list HEAD | wc -l)
+
+echo "attaching history r13412:r43924..."
+git replace $(git rev-list -1 INITIAL_IMPORT) history/EagleEye/zids@43924
+
+after1=$(git rev-list HEAD | wc -l)
+
+echo "attaching history r1:r13412..."
+git replace history/EagleEye/zids@13412 history/EagleEye@1-13412
+
+after2=$(git rev-list HEAD | wc -l)
+
+echo "HEAD history length changed: $before -> $after1 -> $after2"
+
+if [ $after2 -gt $before ]; then
+    echo "SUCCESS!"
+else
+    echo "ERROR!"
+    exit 1
+fi
