@@ -7,6 +7,8 @@ $(basename $0) <upstream> [<branch>...]
  Available options are
 h,help            Show help
 v,verbose         Be verbose
+m,merge           Merge with <master> after bubbled up
+p,push            Push <master> after merge
 "
 
 SUBDIRECTORY_OK=yes

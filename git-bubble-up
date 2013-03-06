@@ -6,11 +6,17 @@
 
 . "$(git boots --sh-setup)"
 
-while getopts "v" flag; do
+while getopts "vmp" flag; do
     case $flag in
         v)
             verbose="$verbose --verbose"
             ;;
+	m)
+	    merge=yes
+	    ;;
+	p)
+	    push=yes
+	    ;;
         :|\?)
             usage
             ;;
@@ -66,6 +72,19 @@ do
         $master \
         $branch
 done
+
+if test -n "$branches"; then
+    for branch in $branches; do
+      say "Merging '$branch' to '$master'..."
+      git checkout -q $master
+      git merge $verbose --no-ff $branch
+      if test -n "$push"; then
+        say "Pushing '$master' to '$upstream_remote'..."
+	git checkout -q $master
+	git push $verbose
+      fi
+    done
+fi
 
 if test "$orig_branch" != "$branches"
 then
