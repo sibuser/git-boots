@@ -1,0 +1,49 @@
+#!/bin/bash
+# Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+. "$(git boots --sh-setup)"
+
+set -e
+
+# a  - simple
+# b: - with arg ($OPTARG)
+while getopts "" flag; do
+    case $flag in
+        :|\?)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
+
+# gather command pipeline
+for opt in "$@"
+do
+    case "$opt" in
+	up|into|out)
+	    pipeline="$pipeline $opt"
+	    ;;
+         *)
+            usage
+            ;;
+    esac
+done
+
+# execute pipeline
+for opt in "$pipeline"
+do
+    case "$opt" in
+	up)
+	    kick_up
+	    ;;
+	into)
+	    kick_into
+	    ;;
+	out)
+	    kick_out
+	    ;;
+        *)
+            usage
+            ;;
+    esac
+done

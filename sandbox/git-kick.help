@@ -1,0 +1,41 @@
+#!/bin/bash
+
+OPTIONS_SPEC=$(cat << EOF
+$(basename $0) up   [<master>] <topic>
+$(basename $0) into [<master>] <topic>
+$(basename $0) out  [<master>] <topic>
+--
+ Available options are
+h,help           show help
+EOF
+)
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE=$(cat << EOF
+DESCRIPTION
+
+Lets you automate process of rebasing you branch on top of freshly updated 
+master branch, merge and push the results.
+
+By no means this script introduces anything new. I just want to make a
+git-kick script because it's fun. If you think the same - enjoy!
+
+EXAMPLES
+
+    Kick up <topic> to the <master>. It means that topic will be rebased on top
+    of freshly updated master.
+
+        \$ $(basename $0) up master topic
+
+    Kick in topic branch into master. It means <topic> will be merged with the
+    current <master> branch:
+
+        \$ $(basename $0) into master topic
+
+    Kick out the result merge. It means <master> branch will be pushed to
+    remote (but only if it's a merge between <master> and <topic>:
+
+        \$ $(basename $0) out master topic
+EOF
+)
