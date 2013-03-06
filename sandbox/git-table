@@ -7,7 +7,7 @@ test -z "$rev_list" && rev_list=HEAD
 git rev-list $rev_list | while read commit
 do
   # prefixes will have list of touched first level directories ordered by amount of changes
-  prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}')
+  prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}' | head -2)
 
   subject=$(git rev-list --format="%s" $commit^! | sed -e '1 d' -e 's/"//g' -e "s/'//g")
 
@@ -26,11 +26,13 @@ s/\.$//     # remove dot, noise it is
 }')
   if test -n "$prefixes"; then
     prefixes=$(echo "["$prefixes"]")
+  else
+    : ${prefixes:="-"}
   fi
   author=$(git rev-list --format=%ae $commit^! | sed -e '1 d' -e 's/@.*//')
   author=$(printf "%-12s\n" $author)
   jira=$(  printf "%-10s\n" $jira)
-  prefixes=$( printf "%-18s\n" "$prefixes")
+  prefixes=$( printf "%-12s\n" "$prefixes")
   git log --format="%C(magenta)$jira%C(reset) %C(cyan)$author%C(reset) %C(cyan)$prefixes%C(reset) %C(yellow)%h%C(reset) $subject %C(green)%d%C(reset)" $commit^!
 done | less -RFiK
 
