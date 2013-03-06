@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# Called by "git commit" with the name of the file that has the
+# commit message, followed by the description of the commit
+# message's source.  The hook's purpose is to edit the commit
+# message file.  If the hook fails with a non-zero status,
+# the commit is aborted.
+#
+# Called with 2 or 3 parameters: $1 $2 [$3]
+#
+# $1      name of file containing the commit log message
+# $2      type of the commit, which can be:
+#         - message (if -m or -F option was given)
+#         - template (via -t option or commit.template configuration)
+#         - merge (if commit is a merge or .git/MERGE_MSG file exists)
+#         - squash (if a .git/SQUASH_MSG file exists)
+#         - commit (if a -c, -C or --amend option was given)
+# $3      only present if $2 is "commit"
+
+case "$2,$3" in
+  message,*)
+    ;;
+  template,*)
+    ;;
+  merge,*)
+    ;;
+  squash,*)
+    ;;
+  commit,*)
+    ;;
+  *)
+    modules=$( \
+      git diff --staged --dirstat=0 |
+      sed -e 's:/.*::' -e 's/%//' | # leave only first directory level & drop percentage symbol
+      awk 'BEGIN {map[""]=""} {map[$2]+=$1;} END {for (v in map) if (v!="") printf "%5.2f %s\n", map[v], v;}' | # foo 66%
+      sort -rn
+    )
+    TMP="$1.tmp.$$"
+    if test -n "$modules"; then
+        names=$(echo "$modules" | awk '{print $2}' | head -2)
+        echo "${names//$'\n'/+}: "
+        echo ""
+        echo "#"
+        echo "# Here is a brief dirstat: "
+        echo "#"
+        echo "$modules" | sed 's/^/#   /'
+        echo "#"
+    fi >> $TMP &&
+    cat "$1" | sed '/^$/ d' >> $TMP &&
+    mv $TMP "$1" || rm -f $TMP
+    ;;
+esac
