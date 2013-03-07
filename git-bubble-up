@@ -73,7 +73,7 @@ do
         $branch
 done
 
-if test -n "$branches"; then
+if test -n "$merge"; then
     for branch in $branches; do
       say "Merging '$branch' to '$master'..."
       git checkout -q $master
