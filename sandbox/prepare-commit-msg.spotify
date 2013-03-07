@@ -31,7 +31,7 @@ BEGIN {
   map[$2]+=$1       # accumulate value in module root ~ foo
 }
 END {
-  fmt= "%5.2f  %-10s %s\n"
+  fmt="%6.2f  %-10s  %s\n"
   for (m in modules) if (m != "")
     if (modules[m] > 1) # more than one module path => print module root
       printf fmt, map[m], m"/", m"/"
