@@ -9,7 +9,7 @@ test -z "$rev_list" && rev_list=HEAD
 git rev-list $rev_list | while read commit
 do
   # prefixes will have list of touched first level directories ordered by amount of changes
-  prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}' | head -2)
+  prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}' | sort -n | head -2)
 
   subject=$(git rev-list --format="%s" $commit^! | sed -e '1 d' -e 's/"//g' -e "s/'//g")
 
