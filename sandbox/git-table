@@ -6,16 +6,19 @@ JIRA_REGEXP='[A-Z][A-Z]*-[0-9][0-9]*'
 rev_list="$@"
 test -z "$rev_list" && rev_list=HEAD
 
-git rev-list $rev_list | while read commit
+git rev-list --format='%h %ae %s' $rev_list | sed '1~2 d' | while read line
 do
-  # prefixes will have list of touched first level directories ordered by amount of changes
-  prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}' | sort -n | head -2)
+  commit=$( echo $line | cut -d ' ' -f1 )
+  author=$( echo $line | cut -d ' ' -f2 )
+  subject=$(echo $line | cut -d ' ' -f3-)
 
-  subject=$(git rev-list --format="%s" $commit^! | sed -e '1 d' -e 's/"//g' -e "s/'//g")
+  author=${author%%@*} # drop domain name
+  subject=${subject//\'/} # drop quotes, they make bash crazy
+  subject=${subject//\"/}
 
   jira=$(echo $subject | grep -o "$JIRA_REGEXP"; exit 0) # ok to fail
-  if test -n "$jira"; then # initialte cleaning only if there is jira ref
-    subject=$(echo $subject | awk '{ for(i=1; i<=NF; i++) if($i ~ /[A-Z][A-Z]*-[0-9][0-9]*/) {$i=""} {print}}')
+  if test -n "$jira"; then
+    subject=$(echo $subject | awk "{ for(i=1; i<=NF; i++) if(\$i ~ /$jira/) {\$i=\"\"} {print}}") # clean from detected jira ref
   fi
 
   subject=$(echo $subject | sed '1 {
@@ -26,15 +29,19 @@ s/^[^:]*:  *// # strip off manually specified prefixes, people lie
 s/^./\U&\E/    # capitalize first letter
 s/\.$//        # remove dot, noise it is
 }')
+
+  # prefixes will have list of touched first level directories ordered by amount of changes
+  prefixes=$(git diff $commit^! --dirstat=cumulative | sort -r | awk '{print $2}' | sed 's:/.*::' | cat -n | sort -ruk2 | awk '{print $2}' | sort -n | head -2)
   if test -n "$prefixes"; then
     prefixes=$(echo "["$prefixes"]")
   else
     : ${prefixes:="-"}
   fi
-  author=$(git rev-list --format=%ae $commit^! | sed -e '1 d' -e 's/@.*//')
-  author=$(printf "%-16s\n" $author)
-  jira=$(  printf "%-10s\n" $jira)
-  prefixes=$( printf "%-16s\n" "$prefixes")
+
+  author=$(  printf "%-16s\n" "$author")
+  jira=$(    printf "%-10s\n" "$jira")
+  prefixes=$(printf "%-16s\n" "$prefixes")
+
   git log --format="%C(magenta)$jira%C(reset) %C(cyan)$author%C(reset) %C(cyan)$prefixes%C(reset) %C(yellow)%h%C(reset) $subject %C(green)%d%C(reset)" $commit^!
 done | less -RFiK
 
