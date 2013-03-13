@@ -14,8 +14,8 @@ do
   subject=$(git rev-list --format="%s" $commit^! | sed -e '1 d' -e 's/"//g' -e "s/'//g")
 
   jira=$(echo $subject | grep -o "$JIRA_REGEXP"; exit 0) # ok to fail
-  if test -n "$jira"; then
-    subject=$(echo $subject | sed "s/$jira//")
+  if test -n "$jira"; then # initialte cleaning only if there is jira ref
+    subject=$(echo $subject | awk '{ for(i=1; i<=NF; i++) if($i ~ /[A-Z][A-Z]*-[0-9][0-9]*/) {$i=""} {print}}')
   fi
 
   subject=$(echo $subject | sed '1 {
