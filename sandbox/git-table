@@ -6,11 +6,13 @@ JIRA_REGEXP='[A-Z][A-Z]*-[0-9][0-9]*'
 rev_list="$@"
 test -z "$rev_list" && rev_list=HEAD
 
-git rev-list --format='%h %ae %s' $rev_list | sed '1~2 d' | while read line
+sep="__SEP__"
+git log --format="%h$sep%ae$sep%s$sep%d" $rev_list | while read line
 do
-  commit=$( echo $line | cut -d ' ' -f1 )
-  author=$( echo $line | cut -d ' ' -f2 )
-  subject=$(echo $line | cut -d ' ' -f3-)
+  commit=$( echo $line | awk -F$sep '{print $1}')
+  author=$( echo $line | awk -F$sep '{print $2}')
+  subject=$(echo $line | awk -F$sep '{print $3}')
+  refs=$(   echo $line | awk -F$sep '{print $4}')
 
   author=${author%%@*} # drop domain name
   subject=${subject//\'/} # drop quotes, they make bash crazy
@@ -42,6 +44,16 @@ s/\.$//        # remove dot, noise it is
   jira=$(    printf "%-10s\n" "$jira")
   prefixes=$(printf "%-16s\n" "$prefixes")
 
-  git log --format="%C(magenta)$jira%C(reset) %C(cyan)$author%C(reset) %C(cyan)$prefixes%C(reset) %C(yellow)%h%C(reset) $subject %C(green)%d%C(reset)" $commit^!
+  black="\e[30m"
+  red="\e[31m"
+  green="\e[32m"
+  yellow="\e[33m"
+  blue="\e[34m"
+  magenta="\e[35m"
+  cyan="\e[36m"
+  white="\e[37m"
+  reset="\e[0m"
+
+  perl -e "print \"$magenta$jira$reset $cyan$author$reset $cyan$prefixes$reset $yellow$commit$reset $subject $green$refs$reset\n\""
 done | less -RFiK
 
