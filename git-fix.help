@@ -10,7 +10,7 @@ EOF
 )
 SUBDIRECTORY_OK=yes
 USAGE=
-LONG_USAGE=$(cat << EOF
+LONG_USAGE="\
 DESCRIPTION
 
 Lets you fixup some commit in the past. It will take changes in the index
@@ -25,5 +25,4 @@ EXAMPLES
     Fixup commit two commits behind HEAD with current changes:
 
         \$ $(basename $0) HEAD~2
-EOF
-)
+"

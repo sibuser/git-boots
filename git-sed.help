@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
-OPTIONS_SPEC=$(cat << EOF
+OPTIONS_SPEC="\
 $(basename $0) [options] <sed-script> -
 $(basename $0) [options] <sed-script> <rev-list options>...
 --
@@ -9,12 +9,11 @@ $(basename $0) [options] <sed-script> <rev-list options>...
 h,help            show help
 f,force           pass --force to git-filter-branch
 n,quiet           pass --quiet to sed
-EOF
-)
+"
 
 SUBDIRECTORY_OK=yes
 USAGE=
-LONG_USAGE=$(cat <<EOF
+LONG_USAGE="\
 DESCRIPTION
 
 Lets you rewrite git revision history by rewriting the branches mentioned in the
@@ -43,15 +42,15 @@ made. All lines will be concatenated and the result line will be used as a
 paramter to invocation e.g. the following commands do exactly the same:
 
     \$ git sed 's/foo/bar/'
-    \$ echo "" | git sed 's/foo/bar/' -
+    \$ echo '' | git sed 's/foo/bar/' -
 
     \$ git sed 's/foo/bar/' HEAD~10..HEAD
-    \$ echo "HEAD~10..HEAD" | git sed 's/foo/bar/' -
+    \$ echo 'HEAD~10..HEAD' | git sed 's/foo/bar/' -
 
     \$ git sed 's/foo/bar/' HEAD~20..HEAD~10
     \$ git sed -f 's/foo/bar/' HEAD~5..HEAD
-    \$ echo -e "HEAD~20..HEAD~10  HEAD~5..HEAD" | git sed -f 's/foo/bar/' -
-    \$ echo -e "HEAD~20..HEAD~10\nHEAD~5..HEAD" | git sed -f 's/foo/bar/' -
+    \$ echo -e 'HEAD~20..HEAD~10  HEAD~5..HEAD' | git sed -f 's/foo/bar/' -
+    \$ echo -e 'HEAD~20..HEAD~10\nHEAD~5..HEAD' | git sed -f 's/foo/bar/' -
 
 BACKUP
 
@@ -82,5 +81,5 @@ Replace 'foo' with 'bar'
 Replace 'foo' with 'bar', ignore backup
 
     \$ $(basename $0) -f 's/foo/bar/' master..topic
-EOF
-)
+"
+
