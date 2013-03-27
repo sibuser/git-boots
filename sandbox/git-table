@@ -18,10 +18,14 @@ do
   subject=${subject//\'/} # drop quotes, they make bash crazy
   subject=${subject//\"/}
 
-  jira=$(echo $subject | grep -o "$JIRA_REGEXP"; exit 0) # ok to fail
-  if test -n "$jira"; then
-    subject=$(echo $subject | awk "{ for(i=1; i<=NF; i++) if(\$i ~ /$jira/) {\$i=\"\"} {print}}") # clean from detected jira ref
+  jira_all=$(echo $subject | grep -o "$JIRA_REGEXP"; exit 0) # ok to fail
+  if test -n "$jira_all"; then
+    for jira in $jira_all
+    do
+      subject=$(echo $subject | awk "{ for(i=1; i<=NF; i++) if(\$i ~ /$jira/) {\$i=\"\"} {print}}") # clean from detected jira ref
+    done
   fi
+  jira=$(echo $jira_all | head -1)
 
   subject=$(echo $subject | sed '1 {
 s/  */ /g      # remove all repeating spaces, who does  this?
@@ -41,7 +45,7 @@ s/\.$//        # remove dot, noise it is
   fi
 
   author=$(  printf "%-16s\n" "$author")
-  jira=$(    printf "%-10s\n" "$jira")
+  jira=$(    printf "%-16s\n" "$jira")
   prefixes=$(printf "%-16s\n" "$prefixes")
 
   black="\e[30m"
