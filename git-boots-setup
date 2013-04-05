@@ -50,4 +50,4 @@ require usage
 . "$(dirname $(readlink -e $0))/git-boots-tools"
 
 # some scripts rely on 1.8.0 functionality (or used to, I'm not sure)
-boots_require_git_version 1.8.1.5
+boots_require_git_version 1.8.2
