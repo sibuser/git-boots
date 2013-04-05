@@ -30,7 +30,7 @@ then
 fi
 
 # automatically apply fixup
-git rebase --autosquash --interactive $commit^ || \
+GIT_EDITOR=":" git rebase --autosquash --interactive $commit^ || \
     if [ -z "$stash" ]; then
         die "Resolve conflicts."
     else
