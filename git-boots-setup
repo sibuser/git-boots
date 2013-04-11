@@ -60,4 +60,4 @@ else
 fi
 
 # some scripts rely on 1.8.0 functionality (or used to, I'm not sure)
-boots_require_git_version 1.8.2.3
+boots_require_git_version 1.8.3.1
