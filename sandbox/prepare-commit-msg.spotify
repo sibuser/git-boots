@@ -48,6 +48,15 @@ case "$2,$3" in
   template,*)
     ;;
   merge,*)
+    commit_msg="$(dirname "$0")/commit-msg"
+    if [ -f $commit_msg ]; then
+      TMP="$1.tmp.$$"
+      cp "$1" $TMP &&
+      $commit_msg $TMP &&
+      echo "" >> $TMP && # for readability
+      cat "$1" | sed -n '/^#/ p' >> $TMP &&
+      mv $TMP "$1" || rm -f $TMP
+    fi
     ;;
   squash,*)
     ;;
