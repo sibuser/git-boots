@@ -63,7 +63,7 @@ boots_require_no_merges "$@"
 echo "" > "$BOOTS_INDEX_FILE"
 
 BOOTS_INDEX_FILE="$BOOTS_INDEX_FILE" \
-BOOTS_GREP_OPTS=" $BOOTS_GREP_OPTS"  \
+BOOTS_GREP_OPTS="$BOOTS_GREP_OPTS"   \
 BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT" \
 git filter-branch -f --commit-filter '
 # proposed tree
