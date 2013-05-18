@@ -82,14 +82,14 @@ matched_files="$(git diff-tree $parent $tree -r --name-only | grep $BOOTS_GREP_O
 if test -z "$matched_files"
 then
   git commit-tree "$@"
-  return $? # done
+  exit $? # done
 fi
 
 # test if commit has *only* matched files
 if test "$matched_files" = "$changed_files"
 then
   sed -r "$BOOTS_SED_SCRIPT" | git commit-tree "$@"
-  return $? # done
+  exit $? # done
 fi
 
 # checkout original tree
