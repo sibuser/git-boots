@@ -101,6 +101,11 @@ boots_require_can_ff () {
     test "$count" = "0" || die "Can't fast-forward from $1 to $2. $3"
 }
 
+boots_require_valid_rev_list () {
+  git rev-parse $@ &>/dev/null ||
+    die "ambiguous or invalid rev-list options: '$rev_args'"
+}
+
 boots_require_git_version () {
     test "$(git --version)" = "git version $1" || die "Update your git to $1.
 Here is how you can do it:

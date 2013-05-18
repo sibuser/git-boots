@@ -42,9 +42,7 @@ then
 fi
 
 test -z "$rev_args" && exit 0 # avoid empty rev-list options
-
-git rev-parse $rev_args &>/dev/null ||
-    die "ambiguous or invalid rev-list options: '$rev_args'"
+boots_require_valid_rev_list $rev_args
 
 git filter-branch $git_force --msg-filter "
     sed $sed_quiet -r '$sed_script'
