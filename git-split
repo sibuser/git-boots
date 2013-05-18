@@ -8,7 +8,7 @@
 trap boots_cleanup EXIT
 
 function boots_cleanup () {
-    rm -f "$BOOTS_DEFAULT_INDEX_FILE"
+  rm -f "$BOOTS_DEFAULT_INDEX_FILE"
 }
 
 BOOTS_DEFAULT_INDEX_FILE="$GIT_DIR/.git-boots-index"
@@ -16,34 +16,34 @@ BOOTS_DEFAULT_INDEX_FILE="$GIT_DIR/.git-boots-index"
 # a  - simple
 # b: - with arg ($OPTARG)
 while getopts "s:p:f:F" flag; do
-    case $flag in
-        f)
-            file="$OPTARG"
-            test ! -f "$file" && die "File '$file' doesn't exist"
+  case $flag in
+    f)
+      file="$OPTARG"
+      test ! -f "$file" && die "File '$file' doesn't exist"
 
-            BOOTS_GREP_OPTS="-f $(readlink -e $file)"
-            ;;
-        F)
-            BOOTS_GREP_OPTS="$BOOTS_GREP_OPTS -F"
-            ;;
-        s)
-            BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT; $OPTARG"
-            ;;
-        p)
-            BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT;
+      BOOTS_GREP_OPTS="-f $(readlink -e $file)"
+      ;;
+    F)
+      BOOTS_GREP_OPTS="$BOOTS_GREP_OPTS -F"
+      ;;
+    s)
+      BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT; $OPTARG"
+      ;;
+    p)
+      BOOTS_SED_SCRIPT="$BOOTS_SED_SCRIPT;
 # prefix first line only
 1 {
-    # not yet prefixed
-    /^$OPTARG/ ! {
-        s/^/$OPTARG/
-    }
+  # not yet prefixed
+  /^$OPTARG/ ! {
+    s/^/$OPTARG/
+  }
 }
 "
-            ;;
-        :|\?)
-            usage
-            ;;
-    esac
+      ;;
+    :|\?)
+      usage
+      ;;
+  esac
 done
 shift $((OPTIND - 1))
 
@@ -53,8 +53,8 @@ boots_require_clean_work_tree
 
 if test -z "$BOOTS_GREP_OPTS"
 then
-    BOOTS_GREP_OPTS="\"$1\""
-    shift
+  BOOTS_GREP_OPTS="\"$1\""
+  shift
 fi
 
 # must be after shift
@@ -81,15 +81,15 @@ matched_files="$(git diff-tree $parent $tree -r --name-only | grep $BOOTS_GREP_O
 # test if commit is OK
 if test -z "$matched_files"
 then
-    git commit-tree "$@"
-    return $? # done
+  git commit-tree "$@"
+  return $? # done
 fi
 
 # test if commit has *only* matched files
 if test "$matched_files" = "$changed_files"
 then
-    sed -r "$BOOTS_SED_SCRIPT" | git commit-tree "$@"
-    return $? # done
+  sed -r "$BOOTS_SED_SCRIPT" | git commit-tree "$@"
+  return $? # done
 fi
 
 # checkout original tree
@@ -106,7 +106,7 @@ commit_without_changes=$(git commit-tree $tree_without_changes -p $parent)
 
 # create the original commit
 git rev-list -1 $commit_without_changes --format=%B |
-    sed "1 d" |
-    sed -r "$BOOTS_SED_SCRIPT" |
-    git commit-tree $tree -p $commit_without_changes
+  sed "1 d" |
+  sed -r "$BOOTS_SED_SCRIPT" |
+  git commit-tree $tree -p $commit_without_changes
 ' "$@"
