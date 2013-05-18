@@ -19,7 +19,7 @@ boots_require_non_unique_ref () {
 }
 
 boots_require_no_merges () {
-    test "$(git rev-list --count --min-parents=2 $@)" != "0" &&
+    test $(git rev-list --count --min-parents=2 $@) -eq 0 ||
         die "You have merges in your rev-list options. No can do."
 }
 
