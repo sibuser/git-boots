@@ -2,7 +2,6 @@
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
 . "$(git boots --sh-setup)"
-require require_clean_work_tree
 
 while getopts "fn" flag; do
     case $flag in
@@ -19,7 +18,7 @@ while getopts "fn" flag; do
 done
 shift $((OPTIND - 1))
 
-require_clean_work_tree "execute $(basename $0)" "Commit or stash your changes and try again."
+boots_require_clean_work_tree "execute $(basename $0)" "Commit or stash your changes and try again."
 
 if [ $# -eq 0 ]; then
     usage
