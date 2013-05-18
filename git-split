@@ -53,7 +53,7 @@ boots_require_clean_work_tree
 
 if test -z "$BOOTS_GREP_OPTS"
 then
-  BOOTS_GREP_OPTS="\"$1\""
+  BOOTS_GREP_OPTS="$1"
   shift
 fi
 
