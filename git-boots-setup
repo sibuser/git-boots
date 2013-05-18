@@ -47,7 +47,17 @@ require () {
 require usage
 
 # include boots tools
-. "$(dirname $(readlink -e $0))/git-boots-tools"
+root="$(dirname $(readlink -e $0))"
+if test -f $root/git-boots-tools; then
+  . $root/git-boots-tools
+else
+  # sandbox
+  if test -f $root/../git-boots-tools; then
+  . $root/../git-boots-tools
+  else
+    die "can't find git-boots-tools"
+  fi
+fi
 
 # some scripts rely on 1.8.0 functionality (or used to, I'm not sure)
 boots_require_git_version 1.8.2.3
