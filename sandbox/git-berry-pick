@@ -67,10 +67,17 @@ run_script() {
   fi
 }
 
+update_submodules () {
+  commit=$1
+  say "Updating submodules for $1"
+  git submodule update --recursive
+}
+
 cdup=$(git rev-parse --show-cdup)
 test -n "$cdup" && cd $cdup
 
 for commit in $(git rev-list --reverse $@); do
+  update_submodules $commit
   run_script $commit
 done
 
