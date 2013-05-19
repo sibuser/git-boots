@@ -1,0 +1,76 @@
+#!/bin/bash
+# Copyright (c) 2013, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+. "$(git boots --sh-setup)"
+
+set -e
+
+# a  - simple
+# b: - with arg ($OPTARG)
+while getopts "" flag; do
+  case $flag in
+    :|\?)
+      usage
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+boots_require_clean_work_tree
+
+if [ $# -eq 0 ]; then
+  usage
+fi
+
+rev_list="$@"
+boots_require_valid_rev_list $rev_list
+boots_require_no_merges $rev_list
+
+extract_script() {
+  git log --format=%B ${@}^! |
+  sed -n '
+/\\#!/,/^$/ p # from escaped dash-bang to the next empty line
+' |
+  sed '
+s:\\#!:#!:    # make a valid dash-bang
+/^$/ d        # remove empty lines
+'
+}
+
+try_commit() {
+  commit=$@
+  if test $(git ls-files -m -d | wc -l) -gt 0; then
+    git commit -a -C $commit || die "Failed to commit berry picked changes"
+    say "Successfully berry picked $commit"
+  else
+    say "Berry picking didn't introduce any changes"
+  fi
+}
+
+run_script() {
+  boots_require_clean_work_tree
+  commit=$1
+  script=$(extract_script $commit)
+  if test -n "$script"; then
+    say "Extracted script from $commit"
+    say "---"
+    say "$script"
+    say "---"
+    tmp=$(boots_temp_file $$)
+    echo "$script" > $tmp
+    chmod u+x $tmp
+    $tmp || die "Failed to run script from $commit"
+    try_commit $commit
+  else
+    say "Can't find a script in $commit"
+  fi
+}
+
+cdup=$(git rev-parse --show-cdup)
+test -n "$cdup" && cd $cdup
+
+for commit in $(git rev-list --reverse $@); do
+  run_script $commit
+done
+
+
