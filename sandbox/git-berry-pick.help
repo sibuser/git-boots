@@ -1,12 +1,12 @@
 #!/bin/bash
 
-OPTIONS_SPEC=$(cat << EOF
+OPTIONS_SPEC="
 $(basename $0) [options] <commit>...
 --
  Available options are
 h,help           show help
-EOF
-)
+n,no-commit      don't commit, run scripts only
+"
 
 SUBDIRECTORY_OK=yes
 USAGE=

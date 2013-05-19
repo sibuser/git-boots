@@ -7,8 +7,11 @@ set -e
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "" flag; do
+while getopts "n" flag; do
   case $flag in
+    n)
+      no_commit="1"
+      ;;
     :|\?)
       usage
       ;;
@@ -61,7 +64,9 @@ run_script() {
     echo "$script" > $tmp
     chmod u+x $tmp
     $tmp || die "Failed to run script from $commit"
-    try_commit $commit
+    if test -z "$no_commit"; then
+      try_commit $commit
+    fi
   else
     say "Can't find a script in $commit"
   fi
