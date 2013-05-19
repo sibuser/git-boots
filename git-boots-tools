@@ -1,6 +1,16 @@
 #!/bin/bash
 # Copyright (c) 2012, Alexander Krasnukhin <the.malkolm@gmail.com>
 
+trap boots_cleanup EXIT
+
+boots_cleanup () {
+  rm -f "$GIT_DIR"/.git-boots.tmp.*
+}
+
+boots_temp_file () {
+  echo "$GIT_DIR/.git-boots.tmp.$@"
+}
+
 no_flags () {
     while getopts "" flag; do
         case $flag in
