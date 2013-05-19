@@ -113,7 +113,7 @@ boots_require_can_ff () {
 
 boots_require_valid_rev_list () {
   git rev-parse $@ &>/dev/null ||
-    die "ambiguous or invalid rev-list options: '$rev_args'"
+    die "ambiguous or invalid rev-list options: '$@'"
 }
 
 boots_require_git_version () {
