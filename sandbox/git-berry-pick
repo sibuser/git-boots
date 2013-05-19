@@ -50,9 +50,10 @@ try_commit() {
 run_script() {
   boots_require_clean_work_tree
   commit=$1
+  say "Berry pick $commit"
   script=$(extract_script $commit)
   if test -n "$script"; then
-    say "Extracted script from $commit"
+    say "Found script in $commit"
     say "---"
     say "$script"
     say "---"
