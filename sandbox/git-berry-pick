@@ -6,6 +6,7 @@
 #      berry pick it with follow up commit.
 # TODO add validator (separate script?) that will validate that bunch
 #      of commits with scripts contain only stuff modified by script
+# TODO when --no-commit, stage changes and write COMMIT_MSG too
 
 . "$(git boots --sh-setup)"
 
