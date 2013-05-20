@@ -38,9 +38,14 @@ Date:   Sat May 18 20:25:22 2013 +0200
     git grep -l 'foo' | \\
       grep '\.h$' | \\
       xargs sed -i 's/foo/bar/g'
+    : # colon is noop in bash
 
     The previous empty line signals end of the script to $(basename $0). You can
-    about it as EOF. After this empty line everything is ignored by $(basename $0).
+    treat it as EOF of script. After this empty line everything is ignored by
+    $(basename $0).
+
+    If you want to have some kind of empty line within a script than you can use
+    ':' for bash etc.
 
 EXAMPLES
 
