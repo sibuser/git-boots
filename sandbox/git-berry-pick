@@ -1,7 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2013, Alexander Krasnukhin <the.malkolm@gmail.com>
 #
-# TODO add --extract-script option to exctract scripts w/o invokations
 # TODO add --cherry-pick option to cherry-pick commit first & than try to
 #      berry pick it with follow up commit.
 # TODO add validator (separate script?) that will validate that bunch
@@ -14,10 +13,13 @@ set -e
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "n" flag; do
+while getopts "np" flag; do
   case $flag in
     n)
-      no_commit="1"
+      opt_no_commit="1"
+      ;;
+    p)
+      opt_print="1"
       ;;
     :|\?)
       usage
@@ -89,8 +91,13 @@ cdup=$(git rev-parse --show-cdup)
 test -n "$cdup" && cd $cdup
 
 for commit in $(git rev-list --reverse $@); do
-  update_submodules $commit
-  run_script $commit
+  if test -n "$opt_print"; then
+    echo $commit
+    echo "$(extract_script $commit)"
+    echo ""
+    continue
+  fi
+  print_script $commit
 done
 
 

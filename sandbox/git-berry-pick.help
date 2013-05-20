@@ -5,7 +5,8 @@ $(basename $0) [options] <commit>...
 --
  Available options are
 h,help           show help
-n,no-commit      don't commit, run scripts only
+n,no-commit      don't automatically commit, only run script
+p,print          don't run script, only print
 "
 
 SUBDIRECTORY_OK=yes
