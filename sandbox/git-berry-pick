@@ -4,6 +4,8 @@
 # TODO add --extract-script option to exctract scripts w/o invokations
 # TODO add --cherry-pick option to cherry-pick commit first & than try to
 #      berry pick it with follow up commit.
+# TODO add validator (separate script?) that will validate that bunch
+#      of commits with scripts contain only stuff modified by script
 
 . "$(git boots --sh-setup)"
 
