@@ -1,5 +1,9 @@
 #!/bin/bash
 # Copyright (c) 2013, Alexander Krasnukhin <the.malkolm@gmail.com>
+#
+# TODO add --extract-script option to exctract scripts w/o invokations
+# TODO add --cherry-pick option to cherry-pick commit first & than try to
+#      berry pick it with follow up commit.
 
 . "$(git boots --sh-setup)"
 
