@@ -81,7 +81,7 @@ run_script() {
   fi
 }
 
-update_submodules () {
+update_submodules() {
   commit=$1
   say "Updating submodules for $1"
   git submodule update --recursive
