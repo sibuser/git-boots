@@ -59,6 +59,11 @@ msg_prepare() {
   echo "$git_dir"/COMMIT_EDITMSG
 }
 
+msg_done() {
+  git_dir=$(git rev-parse --dir-dir)
+  mv "$git_dir"/$1 "$git_dir"/COMMIT_MSG
+}
+
 try_commit() {
   commit=$1
   msg=$2
@@ -111,6 +116,7 @@ for commit in $(git rev-list --reverse $@); do
   run_script $commit
 
   if test -n "$opt_no_commit"; then
+    msg_done "$(msg_prepare $commit)"
     say "Successfully berry picked (no-commit) $commit"
     exit 0;
   fi
@@ -119,6 +125,7 @@ for commit in $(git rev-list --reverse $@); do
   if test -n "$opt_edit_msg"; then
     git_editor $msg
   fi
+  msg_done "$msg"
 
   try_commit $commit $msg
 done
