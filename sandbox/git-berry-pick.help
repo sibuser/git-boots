@@ -7,6 +7,7 @@ $(basename $0) [options] <commit>...
 h,help           show help
 n,no-commit      don't automatically commit, only run script
 p,print          don't run script, only print
+e,edit           edit the commit message
 "
 
 SUBDIRECTORY_OK=yes

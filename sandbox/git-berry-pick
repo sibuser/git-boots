@@ -5,7 +5,6 @@
 #      berry pick it with follow up commit.
 # TODO add validator (separate script?) that will validate that bunch
 #      of commits with scripts contain only stuff modified by script
-# TODO when --no-commit, stage changes and write COMMIT_MSG too
 
 . "$(git boots --sh-setup)"
 
@@ -13,7 +12,7 @@ set -e
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "np" flag; do
+while getopts "npe" flag; do
   case $flag in
     n)
       opt_no_commit="1"
@@ -21,14 +20,15 @@ while getopts "np" flag; do
     p)
       opt_print="1"
       ;;
+    e)
+      opt_edit_msg="1"
+      ;;
     :|\?)
       usage
       ;;
   esac
 done
 shift $((OPTIND - 1))
-
-boots_require_clean_work_tree
 
 if [ $# -eq 0 ]; then
   usage
@@ -49,10 +49,17 @@ s:\\#!:#!:    # make a valid dash-bang
 '
 }
 
+prepare_msg() {
+  git_dir=$(git rev-parse --git-dir)
+  git log --format=%B $1^! > "$git_dir"/COMMIT_EDITMSG
+  echo "$git_dir"/COMMIT_EDITMSG
+}
+
 try_commit() {
-  commit=$@
+  commit=$1
+  msg=$2
   if test $(git ls-files -m -d | wc -l) -gt 0; then
-    git commit -a -C $commit || die "Failed to commit berry picked changes"
+    git commit -a -F $msg || die "Failed to commit berry picked changes"
     say "Successfully berry picked $commit"
   else
     say "Berry picking didn't introduce any changes"
@@ -73,9 +80,6 @@ run_script() {
     echo "$script" > $tmp
     chmod u+x $tmp
     $tmp || die "Failed to run script from $commit"
-    if test -z "$no_commit"; then
-      try_commit $commit
-    fi
   else
     say "Can't find a script in $commit"
   fi
@@ -97,7 +101,20 @@ for commit in $(git rev-list --reverse $@); do
     echo ""
     continue
   fi
-  print_script $commit
+
+  run_script $commit
+
+  if test -n "$opt_no_commit"; then
+    say "Successfully berry picked (no-commit) $commit"
+    exit 0;
+  fi
+
+  msg=$(prepare_msg $commit)
+  if test -n "$opt_edit_msg"; then
+    git_editor $msg
+  fi
+
+  try_commit $commit $msg
 done
 
 
