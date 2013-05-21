@@ -1,14 +1,14 @@
 #!/bin/bash
 
-OPTIONS_SPEC="
+OPTIONS_SPEC="\
 $(basename $0) [options] <commit>...
 --
  Available options are
-h,help           show help
 n,no-commit      don't automatically commit, only run script
 p,print          don't run script, only print
 e,edit           edit the commit message
 f,force          run berry-pick even if tree is dirty (implied --no-commit)
+h,help           show help
 "
 
 SUBDIRECTORY_OK=yes
