@@ -15,13 +15,13 @@ set -e
 while getopts "npe" flag; do
   case $flag in
     n)
-      opt_no_commit="1"
+      opt_no_commit="t"
       ;;
     p)
-      opt_print="1"
+      opt_print="t"
       ;;
     e)
-      opt_edit_msg="1"
+      opt_edit_msg="t"
       ;;
     :|\?)
       usage
