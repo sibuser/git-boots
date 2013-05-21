@@ -12,8 +12,12 @@ set -e
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "npe" flag; do
+while getopts "npef" flag; do
   case $flag in
+    f)
+      opt_force="t"
+      opt_no_commit="t"
+      ;;
     n)
       opt_no_commit="t"
       ;;
@@ -67,7 +71,9 @@ try_commit() {
 }
 
 run_script() {
-  boots_require_clean_work_tree
+  if test -z "$opt_force"; then
+    boots_require_clean_work_tree
+  fi
   commit=$1
   say "Berry pick $commit"
   script=$(extract_script $commit)

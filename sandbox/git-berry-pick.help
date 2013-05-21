@@ -8,6 +8,7 @@ h,help           show help
 n,no-commit      don't automatically commit, only run script
 p,print          don't run script, only print
 e,edit           edit the commit message
+f,force          run berry-pick even if tree is dirty (implied --no-commit)
 "
 
 SUBDIRECTORY_OK=yes
