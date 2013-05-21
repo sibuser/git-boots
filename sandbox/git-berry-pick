@@ -53,7 +53,7 @@ s:\\#!:#!:    # make a valid dash-bang
 '
 }
 
-prepare_msg() {
+msg_prepare() {
   git_dir=$(git rev-parse --git-dir)
   git log --format=%B $1^! > "$git_dir"/COMMIT_EDITMSG
   echo "$git_dir"/COMMIT_EDITMSG
@@ -115,7 +115,7 @@ for commit in $(git rev-list --reverse $@); do
     exit 0;
   fi
 
-  msg=$(prepare_msg $commit)
+  msg=$(msg_prepare $commit)
   if test -n "$opt_edit_msg"; then
     git_editor $msg
   fi
