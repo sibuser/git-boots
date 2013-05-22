@@ -15,5 +15,6 @@ template        generate script template
 template-help   generate help script template
 dir             output boots directory
 todo            output todos
+lazy-setup      setup for lazy people
 EOF
 )

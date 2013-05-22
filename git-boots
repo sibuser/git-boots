@@ -79,6 +79,25 @@ aliases_setup () {
     done
 }
 
+lazy_setup () {
+    git symbolic-ref -m "boots: lazy_setup" h HEAD || die "assert"
+    say "HEAD -> h: OK"
+
+    if git remote | grep -q '^o$'; then
+        err "origin -> o: remote 'o' already exist"
+    else
+        git remote rename origin o || die "assert"
+        say "origin -> o: OK"
+    fi
+
+    if git rev-parse -q --verify m >/dev/null; then
+        err "master -> m: branch 'm' already exist"
+    else
+        git branch -m master m || die "assert"
+        say "master -> m: OK"
+    fi
+}
+
 # TODO check about rerere, it should be enabled too
 env_check () {
     git config --get user.name  >/dev/null || die "Please set user.name: git config --global user.name \"John Doe\""
@@ -161,6 +180,10 @@ case "$1" in
     --todo)
         shift
         boots_todo "$@"
+        ;;
+    --lazy-setup)
+        shift
+        lazy_setup "$@"
         ;;
     *)
         usage
