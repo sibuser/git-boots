@@ -14,7 +14,7 @@ set -e
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "npef" flag; do
+while getopts "npefs:" flag; do
   case $flag in
     f)
       opt_force="t"
@@ -28,6 +28,9 @@ while getopts "npef" flag; do
       ;;
     e)
       opt_edit_msg="t"
+      ;;
+    s)
+      opt_sed_script="$OPTARG"
       ;;
     :|\?)
       usage
@@ -90,6 +93,15 @@ run_script() {
     say "---"
     say "$script"
     say "---"
+    if test -n "$opt_sed_script"; then
+      script=$(echo "$script" | sed -r "$opt_sed_script")
+      say "Running following sed script on extracted script"
+      say "---"
+      say "$opt_sed_script"
+      say "---"
+      say "$script"
+      say "---"
+    fi
     local tmp=$(boots_temp_file $$)
     echo "$script" > $tmp
     chmod u+x $tmp

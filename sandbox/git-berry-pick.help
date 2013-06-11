@@ -8,6 +8,7 @@ n,no-commit      don't automatically commit, only run script
 p,print          don't run script, only print
 e,edit           edit the commit message
 f,force          run berry-pick even if tree is dirty (implied --no-commit)
+s,sed=           run sed script on extracted script before run
 h,help           show help
 "
 
@@ -59,4 +60,8 @@ Berry pick commit with given sha on top of current HEAD
 Berry pick commits on top of current HEAD
 
   \$ $(basename $0) <sha1>..<sha2>
+
+Berry pick commits and run sed script to modify extracted script
+
+  \$ $(basename $0) -s 's/foo/bar/g' <sha1>..<sha2>
 "
