@@ -56,20 +56,20 @@ s:\\#!:#!:    # make a valid dash-bang
 }
 
 msg_prepare() {
-  git_dir=$(git rev-parse --git-dir)
+  local git_dir=$(git rev-parse --git-dir)
   git log --format=%B $1^! > "$git_dir"/COMMIT_EDITMSG
   echo "$git_dir"/COMMIT_EDITMSG
 }
 
 msg_done() {
-  git_dir=$(git rev-parse --git-dir)
+  local git_dir=$(git rev-parse --git-dir)
   mv $1 "$git_dir"/COMMIT_MSG
   echo "$git_dir"/COMMIT_MSG
 }
 
 try_commit() {
-  commit=$1
-  msg=$2
+  local commit=$1
+  local msg=$2
   if test $(git ls-files -m -d | wc -l) -gt 0; then
     git commit -a -F $msg || die "Failed to commit berry picked changes"
     say "Successfully berry picked $commit"
@@ -82,15 +82,15 @@ run_script() {
   if test -z "$opt_force"; then
     boots_require_clean_work_tree
   fi
-  commit=$1
+  local commit=$1
   say "Berry pick $commit"
-  script=$(extract_script $commit)
+  local script=$(extract_script $commit)
   if test -n "$script"; then
     say "Found script in $commit"
     say "---"
     say "$script"
     say "---"
-    tmp=$(boots_temp_file $$)
+    local tmp=$(boots_temp_file $$)
     echo "$script" > $tmp
     chmod u+x $tmp
     $tmp || die "Failed to run script from $commit"
@@ -100,7 +100,7 @@ run_script() {
 }
 
 update_submodules() {
-  commit=$1
+  local commit=$1
   say "Updating submodules for $1"
   git submodule update --recursive
 }
