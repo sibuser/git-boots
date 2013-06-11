@@ -62,8 +62,9 @@ msg_prepare() {
 }
 
 msg_done() {
-  git_dir=$(git rev-parse --dir-dir)
-  mv "$git_dir"/$1 "$git_dir"/COMMIT_MSG
+  git_dir=$(git rev-parse --git-dir)
+  mv $1 "$git_dir"/COMMIT_MSG
+  echo "$git_dir"/COMMIT_MSG
 }
 
 try_commit() {
@@ -127,7 +128,7 @@ for commit in $(git rev-list --reverse $@); do
   if test -n "$opt_edit_msg"; then
     git_editor $msg
   fi
-  msg_done "$msg"
+  msg=$(msg_done "$msg")
 
   try_commit $commit $msg
 done
