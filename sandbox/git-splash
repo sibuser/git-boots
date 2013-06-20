@@ -1,0 +1,114 @@
+#!/bin/bash
+# Copyright (c) 2013, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+. "$(git boots --sh-setup)"
+
+# a  - simple
+# b: - with arg ($OPTARG)
+while getopts "" flag; do
+  case $flag in
+    :|\?)
+      usage
+     ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+rev_list="$@"
+boots_require_valid_rev_list $rev_list
+boots_require_valid_range $rev_list
+boots_require_no_merges $rev_list
+boots_require_clean_work_tree
+boots_require_non_detached_head
+
+orig_head=$(boots_current_branch)
+
+base=
+cherry_ok=()
+cherry_fail=()
+
+grouped=()
+ungrouped=()
+
+function do_reset() {
+  git reset --hard "$@" &>/dev/null
+}
+
+function do_filter() {
+  local commits=$(git log --reverse --format=%h "$@")
+  base=$(echo "$commits" | head -1)
+
+  for commit in $commits; do
+    if test $commit == $base; then
+      continue
+    fi
+
+    do_reset $base
+    if (git cherry-pick $commit &>/dev/null); then
+      cherry_ok=("${cherry_ok[@]}" $commit)
+    else
+      cherry_fail=("${cherry_fail[@]}" $commit)
+    fi
+  done
+}
+
+function do_group() {
+  grouped=("${cherry_ok[@]}")
+  ungrouped=()
+  for commit in "${cherry_fail[@]}"; do
+    local found=0
+    for group in "${grouped[@]}"; do
+      do_reset $base
+      for grouped_commit in $group; do
+        git cherry-pick $grouped_commit &>/dev/null
+      done
+      if (git cherry-pick $commit &>/dev/null); then
+        grouped=("${grouped[@]/$group/$group $commit}")
+        found=1
+        break # found
+      fi
+    done
+    if test $found -eq 0; then
+      ungrouped=("${ungrouped[@]}" $commit)
+    fi
+  done
+}
+
+function do_normalize() {
+  do_reset $base
+  for group in "${grouped[@]}"; do
+    for commit in $group; do
+      git cherry-pick $commit &>/dev/null
+    done
+    for commit in "${ungrouped[@]}"; do
+      if git cherry-pick $commit &>/dev/null; then
+        ungrouped=("${ungrouped[@]/$commit/}")
+      else
+        do_reset
+      fi
+    done
+  done
+  if test "(${ungrouped[@]})" = "" ; then
+    err "failed to normalize: ${ungrouped[@]}:"
+    do_reset $orig_head
+    git checkout $orig_head &>/dev/null
+    exit 1
+  fi
+}
+
+function do_print() {
+  for group in "${grouped[@]}"; do
+    do_reset $base
+    for commit in $group; do
+      git cherry-pick $commit &>/dev/null
+    done
+    echo $(git rev-parse HEAD)
+  done
+}
+
+do_filter $rev_list
+do_group
+do_normalize
+do_print
+do_reset $orig_head
+git checkout $orig_head &>/dev/null

@@ -1,0 +1,44 @@
+#!/bin/bash
+
+OPTIONS_SPEC="\
+$(basename $0) [options] [<rev-list options>...]
+--
+ Available options are
+h,help           show help
+"
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE="\
+DESCRIPTION
+
+Lets you splash linear history into bunch of independent branches with a
+common parent. The main purpose is to extract independent patches from
+the provided range for further processing.
+
+Say you have:
+
+M---A---B---C---D
+
+You know that they are mostly (not all) independent and would like to
+divide them in minimal independent subsets i.e. so you can submit each
+of them independently somewhere (e.g. gerrit).
+
+  A (foo_0)
+ /
+M---B'---C' (foo_1)
+ \\
+  D' (foo_2)
+
+Here $(basename $0) splashed into three branches because B and C are
+dependent i.e. you can't apply C without B.
+
+Splash and print all hashes (default)
+
+  \$ $(basename $0) M..D
+  29fdc9297f2ed9f62917e611a0bafef320c1c889 # foo_0
+  4ad0a866a0f039e3621c9b3b7da07c735b1fc3e4 # foo_1
+  ad403034efab318902a7207bbde8350168238d4f # foo_2
+
+EXAMPLES
+"
