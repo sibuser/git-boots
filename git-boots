@@ -49,7 +49,13 @@ h,help           show help
 
 SUBDIRECTORY_OK=yes
 USAGE=
-LONG_USAGE=
+LONG_USAGE="\
+DESCRIPTION
+
+This foo does bar and moo. How cool is that?
+
+EXAMPLES
+"
 EOS
 }
 
