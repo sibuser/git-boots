@@ -116,6 +116,11 @@ boots_require_valid_rev_list () {
     die "ambiguous or invalid rev-list options: '$@'"
 }
 
+boots_require_valid_range () {
+  test 2 -eq $(git rev-parse $@ | wc -l) ||
+    die "ambiguous or invalid range rev-list options: '$@'"
+}
+
 boots_require_git_version () {
     test "$(git --version)" = "git version $1" || die "Update your git to $1.
 Here is how you can do it:
