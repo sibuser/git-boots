@@ -121,7 +121,6 @@ for commit in $(git rev-list --reverse $@); do
   if test -n "$opt_print"; then
     echo $commit
     echo "$(extract_script $commit)"
-    echo ""
     continue
   fi
 
