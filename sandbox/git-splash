@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2013, Alexander Krasnukhin <the.malkolm@gmail.com>
+# TODO git-splash base from to, should splash from..to on base
 
 . "$(git boots --sh-setup)"
 
