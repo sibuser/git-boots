@@ -57,8 +57,10 @@ s:\\#!:#!:    # make a valid dash-bang
 
 msg_prepare() {
   local git_dir=$(git rev-parse --git-dir)
-  git log --format=%B $1^! > "$git_dir"/COMMIT_EDITMSG
-  echo "$git_dir"/COMMIT_EDITMSG
+  local msg="$git_dir"/COMMIT_EDITMSG
+  git log --format=%B $1^! |
+    sed "/\\#!/,/^\$/ ${opt_sed_script:-n}" > "$msg"
+  echo "$msg"
 }
 
 msg_done() {
