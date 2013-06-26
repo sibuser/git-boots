@@ -4,6 +4,7 @@ OPTIONS_SPEC="\
 $(basename $0) [options]
 --
  Available options are
+e,exec=          execute command on each found lock
 h,help           show help
 "
 
@@ -16,5 +17,15 @@ caution! Lock are there for good reason!
 
 EXAMPLES
 
+Remove all locks in the current .git folder.
+
   \$ $(basename $0)
+
+Print all locks in the current .git folder
+
+  \$ $(basename $0) -e echo
+
+Remove all locks in the current .git folder with 'sudo rm'
+
+  \$ $(basename $0) -e 'sudo rm'
 "

@@ -7,8 +7,11 @@ set -e
 
 # a  - simple
 # b: - with arg ($OPTARG)
-while getopts "" flag; do
+while getopts "e:" flag; do
   case $flag in
+    e)
+      opt_exec="$OPTARG"
+      ;;
     :|\?)
       usage
      ;;
@@ -16,7 +19,9 @@ while getopts "" flag; do
 done
 shift $((OPTIND - 1))
 
+: ${opt_exec:=rm -f}
+
 git_dir=$(git rev-parse --git-dir)
-find "$git_dir" -type f -name index.lock -exec rm -f {} \;
+find "$git_dir" -type f -name index.lock -exec $opt_exec {} \;
 
 
