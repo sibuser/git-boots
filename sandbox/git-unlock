@@ -1,0 +1,22 @@
+#!/bin/bash
+# Copyright (c) 2013, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+. "$(git boots --sh-setup)"
+
+set -e
+
+# a  - simple
+# b: - with arg ($OPTARG)
+while getopts "" flag; do
+  case $flag in
+    :|\?)
+      usage
+     ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+git_dir=$(git rev-parse --git-dir)
+find "$git_dir" -type f -name index.lock -exec rm -f {} \;
+
+

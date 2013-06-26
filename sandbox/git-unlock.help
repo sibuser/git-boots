@@ -1,0 +1,20 @@
+#!/bin/bash
+
+OPTIONS_SPEC="\
+$(basename $0) [options]
+--
+ Available options are
+h,help           show help
+"
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE="DESCRIPTION
+
+Removes any stale index.lock files you have in the .git folder. Use with
+caution! Lock are there for good reason!
+
+EXAMPLES
+
+  \$ $(basename $0)
+"
