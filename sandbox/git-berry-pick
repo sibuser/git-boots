@@ -73,6 +73,7 @@ try_commit() {
   local commit=$1
   local msg=$2
   if test $(git ls-files -m -d | wc -l) -gt 0; then
+    git submodule update --init --recursive
     git commit -a -F $msg || die "Failed to commit berry picked changes"
     say "Successfully berry picked $commit"
   else
