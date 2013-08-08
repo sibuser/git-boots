@@ -1,0 +1,96 @@
+#!/bin/bash
+
+# i.e. release-0.7.0, release-0.8.0-rc
+release_pattern='release-*'
+
+function do_list_releases {
+  git tag -l "release-*" | sort -n
+}
+
+function do_report {
+  git --no-pager log --oneline "$@"
+}
+
+# expects branch name be origin/release-0.6.x or origin/master
+# (with any name of the remote i.e. not only origin)
+#
+# usage: do_report_unreleased <remote/release/branch>
+# usage: do_report_unreleased origin/master
+function do_report_unreleased {
+  local release_remote_branch=$1
+  local release_branch=$(basename $release_remote_branch)
+
+  # tag that starts this release train (bogus name for master)
+  local release_tag="${release_branch%\.x}.0"
+
+  # all minor releases on this release train (none for master)
+  local release_minor_tags=$(do_list_releases | grep "${release_branch%\.x}")
+
+  # all previous release tags (all tags for master)
+  local prev_release_tags=$(do_list_releases | sed "/$release_tag/ q" | sed "/$release_tag/ d")
+
+  # all previous relese branches
+  local prev_release_remote_branches=$(echo "$prev_release_tags" | sed -n "s/\.0$/.x/g p" | sed "s:^:$(dirname $release_remote_branch)/:g")
+
+  # i.e. report everything that is in the release branch but not released i.e. not included in any tag
+  output=$(do_report $(echo "$prev_release_tags $release_minor_tags $prev_release_remote_branches" | tr ' ' '\n' | sed '/^ *$/ d' | sed 's/^/^/') $release_remote_branch)
+  if [ -n "$output" ]; then
+    local total=$(echo "$output" | sed -n '$ =')
+    echo
+    echo "UNRELEASED in $release_branch ($total):"
+    echo "$output" | sed 's/^/  /g'
+  fi
+}
+
+prev_release_branches=   # global on purpose!
+
+# usage do_report_unmerged <remote/release/branch>
+# usage do_report_unmerged origin/master
+function do_report_unmerged {
+  local release_branch=$1
+
+  # we accumulate release branchs on go in this variable
+  if [ -z "$prev_release_branches" ]; then
+    prev_release_branches=$release_branch
+    return
+  fi
+
+  local header_printed=
+  # check if release_branch miss anything for accumulated branches
+  for prev_release_branch in $prev_release_branches
+  do
+    local unmerged_commits=$(git cherry $release_branch $prev_release_branch | sed '/^-/ d' | sed 's/^+ //')
+    if [ -n "$unmerged_commits" ]; then
+      # print header only if there are some unmerged commits
+      if [ -z "$header_printed" ]; then
+        echo
+        echo UNMERGED to $release_branch
+        header_printed=1
+      fi
+      # print subheader
+      local total=$(echo "$unmerged_commits" | sed -n '$ =')
+      echo "  from $prev_release_branch ($total):"
+      for commit in $unmerged_commits; do
+        do_report $commit^! | sed "s/^/    /g"
+      done
+    fi
+  done
+  prev_release_branches+=" "
+  prev_release_branches+=$release_branch
+}
+
+for r in $(do_list_releases | grep '\.0$')
+do
+  branch="${r%.0}.x"
+  do_report_unreleased o/$branch
+done
+do_report_unreleased o/master
+
+for r in $(do_list_releases | grep '\.0$')
+do
+  branch="${r%.0}.x"
+  do_report_unmerged o/$branch
+done
+do_report_unmerged o/master
+
+
