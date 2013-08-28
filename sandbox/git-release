@@ -12,6 +12,10 @@ function do_list_releases {
   git tag -l "release-*" | sort -n
 }
 
+function do_list_release_candidates {
+  git branch -r | grep -o 'release\-.*\-rc' | sort -n
+}
+
 function do_report {
   git --no-pager log --oneline "$@"
 }
