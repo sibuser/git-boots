@@ -1,4 +1,9 @@
 #!/bin/bash
+# Copyright (c) 2013, Alexander Krasnukhin <the.malkolm@gmail.com>
+
+. "$(git boots --sh-setup)"
+
+set -e
 
 # i.e. release-0.7.0, release-0.8.0-rc
 release_pattern='release-*'
