@@ -1,0 +1,19 @@
+#!/bin/bash
+
+OPTIONS_SPEC="\
+$(basename $0) [options]
+--
+ Available options are
+r,unreleased     show unreleased commits
+m,unmerged       show unmerged commits
+h,help           show help
+"
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE="DESCRIPTION
+
+This foo does bar and moo. How cool is that?
+
+EXAMPLES
+"
