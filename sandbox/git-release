@@ -88,18 +88,43 @@ function do_report_unmerged {
   prev_release_branches+=$release_branch
 }
 
-for r in $(do_list_releases | grep '\.0$')
-do
-  branch="${r%.0}.x"
-  do_report_unreleased o/$branch
+# a  - simple
+# b: - with arg ($OPTARG)
+while getopts "rm" flag; do
+  case $flag in
+    r)
+      opt_show_unreleased=1
+      ;;
+    m)
+      opt_show_unmerged=1
+      ;;
+    :|\?)
+      usage
+      ;;
+  esac
 done
-do_report_unreleased o/master
+shift $((OPTIND - 1))
 
-for r in $(do_list_releases | grep '\.0$')
-do
-  branch="${r%.0}.x"
-  do_report_unmerged o/$branch
-done
-do_report_unmerged o/master
+if test -n "$opt_show_unreleased"; then
+  for r in $(do_list_releases | grep '\.0$')
+  do
+    branch="${r%.0}.x"
+    do_report_unreleased o/$branch
+  done
+  for r in $(do_list_release_candidates)
+  do
+    do_report_unreleased o/$r
+  done
+  do_report_unreleased o/master
+fi
+
+if test -n "$opt_show_unmerged"; then
+  for r in $(do_list_releases | grep '\.0$')
+  do
+    branch="${r%.0}.x"
+    do_report_unmerged o/$branch
+  done
+  do_report_unmerged o/master
+fi
 
 
