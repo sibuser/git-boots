@@ -9,11 +9,11 @@ set -e
 release_pattern='release-*'
 
 function do_list_releases {
-  git tag -l "release-*" | sort -n
+  git tag -l "release-*" | sort --version-sort
 }
 
 function do_list_release_candidates {
-  git branch -r | grep -o 'release\-.*\-rc' | sort -n
+  git branch -r | grep -o 'release\-.*\-rc' | sort --version-sort
 }
 
 function do_report {
