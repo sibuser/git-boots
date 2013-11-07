@@ -5,3 +5,4 @@ git-automove                - detect moved files & update index if any
 git-author                  - reset committer & author in specified commits
 git-cherry-drop             - opposite of cherry-pick, drop selected commits
 git-jira                    - retrieve issue's sanitized title (for merge commits etc.)
+git-fix -n                  - don't run rebase
