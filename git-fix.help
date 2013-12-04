@@ -6,6 +6,7 @@ $(basename $0) <commit>
 --
  Available options are
 h,help            show help
+n,no-rebase       commit only, do not rebase
 EOF
 )
 SUBDIRECTORY_OK=yes
