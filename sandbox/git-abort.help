@@ -1,0 +1,22 @@
+#!/bin/bash
+
+OPTIONS_SPEC="\
+$(basename $0) [options]
+--
+ Available options are
+h,help           show help
+"
+
+SUBDIRECTORY_OK=yes
+USAGE=
+LONG_USAGE="DESCRIPTION
+
+Aborts any (known) ongoing git process that is probably ongoing. It will abort
+rebases, merges, cherry-picks, bisects etc.
+
+EXAMPLES
+
+Abort any ongoing process.
+
+  \$ $(basename $0)
+"
